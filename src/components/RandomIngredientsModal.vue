@@ -104,4 +104,7 @@ export default defineComponent({
     button.btn-ing {
         margin-top: .2rem;
     }
+    .modal {
+        display: block;
+    }
 </style>

@@ -56,3 +56,9 @@ export default defineComponent({
     }
 })
 </script>
+
+<style scoped>
+  .modal {
+    display: block;
+  }
+</style>
