@@ -15,3 +15,16 @@
  *     doAThing: () => {}
  *   })
  */
+import { ipcRenderer, contextBridge } from 'electron'
+
+contextBridge.exposeInMainWorld('recipeApi', {
+    request: async (url) => {
+        return await ipcRenderer.invoke('request', url)
+    },
+    writeJSON: async (fileName, data) => {
+        return await ipcRenderer.invoke('writeJSON', fileName, data)
+    },
+    readJSON: async (fileName) => {
+        return await ipcRenderer.invoke('readJSON', fileName)
+    },
+})

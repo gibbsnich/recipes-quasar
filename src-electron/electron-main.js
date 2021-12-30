@@ -1,6 +1,8 @@
-import { app, BrowserWindow, nativeTheme } from 'electron'
+import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron'
 import path from 'path'
 import os from 'os'
+import axios from 'axios'
+import fs from 'fs';
 
 // needed in case process is undefined under Linux
 const platform = process.platform || os.platform()
@@ -61,3 +63,47 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+ipcMain.handle('request', async (event, url) => {
+  const result = await axios.get(url);
+  return result.data;
+});
+
+function getAppPath() {
+  if (process.env.NODE_ENV === 'development') {
+    return app.getAppPath();
+  } else {
+    return app.getPath('appData');
+  }
+}
+
+function getDataPath(fileName) {
+  if (fileName) {
+    return path.join(getAppPath(), 'electron-recipe-data', `${fileName}.json`);
+  }
+  return path.join(getAppPath(), 'electron-recipe-data');
+}
+
+ipcMain.handle('readJSON', async (event, fileName) => {
+  const dirPath = getDataPath(null);
+  const dirExists = fs.existsSync(dirPath);
+  if (!dirExists) {
+    const mkdirErr = await fs.promises.mkdir(dirPath);
+    if (mkdirErr) {
+      console.warn(mkdirErr);
+      return;
+    }
+  }
+  const path = getDataPath(fileName);
+  const exists = fs.existsSync(path);
+  if (exists) {
+    const data = await fs.promises.readFile(path, {encoding: 'UTF-8'});
+    return JSON.parse(data);
+  } else {
+    return [];
+  }
+});
+
+ipcMain.handle('writeJSON', async (event, ...data) => {
+  await fs.promises.writeFile(getDataPath(data[0]), data[1]);
+});

@@ -1,26 +1,29 @@
-# Recipes (recipes-quasar)
+# Recipes-Quasar
 
-Manage your recipes
+An Electron/VueJS 3 based app to manage cooking recipes and lists of ingredients to buy.  
+It is based on https://quasar.dev/.  
+## Get Started
 
-## Install the dependencies
+To start developing this Electron application execute the following commands:
+
 ```bash
-yarn
+git clone https://github.com/gibbsnich/recipes-quasar
+cd recipes-quasar
+yarn install
+npm run dev
+npm run dev:electron
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+That's all!
+
+## Commands
+
 ```bash
-quasar dev
+npm run dev # starts application with hot reload
+npm run build # builds application
+
+# OR
+
+npm run build:electron # uses windows as build target
 ```
 
-### Lint the files
-```bash
-yarn run lint
-```
-
-### Build the app for production
-```bash
-quasar build
-```
-
-### Customize the configuration
-See [Configuring quasar.conf.js](https://quasar.dev/quasar-cli/quasar-conf-js).

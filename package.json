@@ -1,20 +1,39 @@
 {
   "name": "recipes-quasar",
-  "version": "0.0.1",
-  "description": "Manage your recipes",
+  "version": "0.1.1",
+  "description": "Manage your cooking recipes with this electron app.",
   "productName": "Recipes",
-  "author": "gibbsnich <gibbsnich@gmail.com>",
-  "private": true,
+  "private": false,
+
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
-    "dev:electron": "quasar dev -m electron"
+    "dev:electron": "quasar dev -m electron",
+    "build": "quasar build",
+    "build:electron": "quasar build -m electron"
+  },
+  "repository": "https://github.com/gibbsnich/recipes-quasar",
+  "author": {
+    "name": "gibbsnich",
+    "url": "https://github.com/gibbsnich"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/vue-fontawesome": "^3.0.0-5",
+    "@fullcalendar/core": "^5.10.1",
+    "@fullcalendar/daygrid": "^5.10.1",
+    "@fullcalendar/interaction": "^5.10.1",
+    "@fullcalendar/timegrid": "^5.10.1",
+    "@fullcalendar/vue3": "^5.10.1",
+    "@popperjs/core": "^2.11.0",
     "@quasar/extras": "^1.0.0",
     "axios": "^0.21.1",
+    "bootstrap": "^5.1.3",
+    "cheerio": "^1.0.0-rc.10",
     "core-js": "^3.6.5",
+    "jspdf": "^2.5.0",
     "quasar": "^2.0.0",
     "vuex": "^4.0.1"
   },
@@ -22,6 +41,8 @@
     "@babel/eslint-parser": "^7.13.14",
     "@quasar/app": "^3.0.0",
     "electron": "^16.0.5",
+    "electron-builder": "^22.4.0",
+    "electron-packager": "^15.2.0",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-vue": "^7.0.0",
