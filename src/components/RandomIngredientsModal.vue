@@ -20,9 +20,9 @@
                                     {{ item.ingredient }}
                                 </button>
                         </accordion>
-                        <p>Gewählte Zutaten:</p>
-                        <ingredients-list :ingredients="this.ingredients" />
                     </div>
+                    <p>Gewählte Zutaten:</p>
+                    <ingredients-list :ingredients="this.ingredients" />
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" @click="close">Speichern</button>
