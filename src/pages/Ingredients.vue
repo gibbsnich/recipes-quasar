@@ -1,4 +1,5 @@
 <template>
+    <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated" />
     <settings-menu activeTab="ingredients" />
     <div class="container">
         <h4>Zutaten</h4>
@@ -44,11 +45,13 @@
 <script>
 import { defineComponent } from 'vue';
 import SettingsMenu from '../components/SettingsMenu.vue';
+import LoginModal from '../components/web/LoginModal.vue';
 
 export default defineComponent({
   name: 'ingredients',
   components: {
     SettingsMenu,
+    LoginModal,
   },
   data() {
       return {

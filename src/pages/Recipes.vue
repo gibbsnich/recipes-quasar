@@ -1,4 +1,5 @@
 <template>
+    <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated" />
     <ingredient-without-category-modal v-show="isIngredientWithoutCategoryModalVisible" @close="closeIngredientsWithoutCategoryModal" v-bind:ingredient="ingredientWithoutCategory" />
     <settings-menu activeTab="recipes" />
     <div class="container">
@@ -36,6 +37,7 @@ import RecipeImporter from '../components/RecipeImporter.vue';
 import { UnknownIngredientsMixin } from '../components/UnknownIngredientsMixin.js';
 import IngredientWithoutCategoryModal from '../components/IngredientWithoutCategoryModal.vue';
 import SettingsMenu from '../components/SettingsMenu.vue';
+import LoginModal from '../components/web/LoginModal.vue';
 
 export default defineComponent({
   name: 'recipes',
@@ -44,6 +46,7 @@ export default defineComponent({
     RecipeImporter,
     IngredientWithoutCategoryModal,
     SettingsMenu,
+    LoginModal,
   },
   mixins: [UnknownIngredientsMixin],
   data() {

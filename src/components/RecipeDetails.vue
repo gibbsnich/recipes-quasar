@@ -2,16 +2,16 @@
     <div class="row mb-3">
         <label for="name-input" class="col-sm-2 col-form-label">Name</label>
         <div class="col-sm-10">
-        <input type="text" class="form-control" id="name-input" placeholder="Name" v-model="currentRecipe.name">
+            <input type="text" class="form-control" id="name-input" placeholder="Name" v-model="currentRecipe.name">
         </div>
     </div>
     <div class="row mb-3">
         <label for="name-input" class="col-sm-2 col-form-label">Genug für</label>
         <div class="col-sm-3">
-        <input type="text" class="form-control" id="name-input" placeholder="Anzahl" v-model="currentRecipe.serving.value">
+            <input type="text" class="form-control" id="name-input" placeholder="Anzahl" v-model="currentRecipe.serving.value">
         </div>
         <div class="col-sm-7">
-        <input type="text" class="form-control" id="name-input" placeholder="Portionen/Stücke/etc." v-model="currentRecipe.serving.type">
+            <input type="text" class="form-control" id="name-input" placeholder="Portionen/Stücke/etc." v-model="currentRecipe.serving.type">
         </div>
     </div>
     <div class="row mb-3">

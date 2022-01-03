@@ -42,6 +42,14 @@ export default store(function (/* { ssrContext } */) {
           ingredientCategories: [],
           ingredientStores: [],
           ingredients: [],
+          isInitialized: false,
+          isAuthenticated: true,
+          isRecipeEventDirty: false,
+          isRecipesDirty: false,
+          isRecipeCategoriesDirty: false,
+          isIngredientsDirty: false,
+          isIngredientCategoriesDirty: false,
+          isIngredientStoreDirty: false,
       }
   },
   getters: {
@@ -199,79 +207,204 @@ export default store(function (/* { ssrContext } */) {
               }
           });
       },
+      authenticated(state, isAuth) {
+          state.isAuthenticated = isAuth;
+      },
+      initialized(state, isInit) {
+          state.isInitialized = isInit;
+      },
+      recipeEventsDirty(state, isDirty) {
+          state.isRecipeEventDirty = isDirty;
+      },
+      recipesDirty(state, isDirty) {
+          state.isRecipesDirty = isDirty;
+      },
+      recipeCategoriesDirty(state, isDirty) {
+          state.isRecipeCategoriesDirty = isDirty;
+      },
+      ingredientsDirty(state, isDirty) {
+          state.isIngredientsDirty = isDirty;
+      },
+      ingredientCategoriesDirty(state, isDirty) {
+          state.isIngredientCategoriesDirty = isDirty;
+      },
+      ingredientStoresDirty(state, isDirty) {
+          state.isIngredientStoreDirty = isDirty;
+      },
   },
   actions: {
-      async loadInitialData({ commit }) {
-          commit('initStore', {
-            recipes: await window.recipeApi.readJSON('recipes'),//await ipcRenderer.invoke('readJSON', 'recipes'),
-            recipeCategories: await window.recipeApi.readJSON('recipe_categories'),//await ipcRenderer.invoke('readJSON', 'recipe_categories'),
-            events: await window.recipeApi.readJSON('events'),//await ipcRenderer.invoke('readJSON', 'events'),
-            ingredients: await window.recipeApi.readJSON('ingredients'),//await ipcRenderer.invoke('readJSON', 'ingredients'),
-            ingredientCategories: await window.recipeApi.readJSON('ingredient_categories'),//await ipcRenderer.invoke('readJSON', 'ingredient_categories'),
-            ingredientStores: await window.recipeApi.readJSON('ingredient_stores'),//await ipcRenderer.invoke('readJSON', 'ingredient_stores'),
-        });
+      async loadInitialData({ commit, state }) {
+          debugger;
+          if (!state.isInitialized) {
+            try {
+                commit('initStore', {
+                    recipes: await window.recipeApi.readJSON('recipes'),
+                    recipeCategories: await window.recipeApi.readJSON('recipe_categories'),
+                    events: await window.recipeApi.readJSON('events'),
+                    ingredients: await window.recipeApi.readJSON('ingredients'),
+                    ingredientCategories: await window.recipeApi.readJSON('ingredient_categories'),
+                    ingredientStores: await window.recipeApi.readJSON('ingredient_stores'),
+                });
+                commit('authenticated', true);
+                commit('initialized', true);
+            } catch(e) {
+                commit('authenticated', false);
+            }
+        } else {
+            if (state.isAuthenticated && state.isRecipeEventDirty) {
+                try {
+                    await window.recipeApi.writeJSON('events', JSON.stringify(state.events));
+                    commit('recipeEventsDirty', false);
+                } catch (e) {
+                    commit('authenticated', false);
+                }
+            }
+            if (state.isAuthenticated && state.isRecipesDirty) {
+                try {
+                    await window.recipeApi.writeJSON('recipes', JSON.stringify(state.recipes));
+                    commit('recipesDirty', false);
+                } catch (e) {
+                    commit('authenticated', false);
+                }
+            }
+            if (state.isAuthenticated && state.isRecipeCategoriesDirty) {
+                try {
+                    await window.recipeApi.writeJSON('recipe_categories', JSON.stringify(state.recipeCategories));
+                    commit('recipeCategoriesDirty', false);
+                } catch (e) {
+                    commit('authenticated', false);
+                }
+            }
+            if (state.isAuthenticated && state.isIngredientsDirty) {
+                try {
+                    await window.recipeApi.writeJSON('ingredients', JSON.stringify(state.ingredients));
+                    commit('ingredientsDirty', false);
+                } catch (e) {
+                    commit('authenticated', false);
+                }
+            }
+            if (state.isAuthenticated && state.isIngredientCategoriesDirty) {
+                try {
+                    await window.recipeApi.writeJSON('ingredient_categories', JSON.stringify(state.ingredientCategories));
+                    commit('ingredientCategoriesDirty', false);
+                } catch (e) {
+                    commit('authenticated', false);
+                }
+            }
+            if (state.isAuthenticated && state.isIngredientStoreDirty) {
+                try {
+                    await window.recipeApi.writeJSON('ingredient_stores', JSON.stringify(state.ingredientStores));
+                    commit('ingredientStoreDirty', false);
+                } catch (e) {
+                    commit('authenticated', false);
+                }
+            }
+        }
       },
       async storeRecipeEvent({ commit, state }, event) {
           commit('storeRecipeEvent', event);
-          //await ipcRenderer.invoke('writeJSON', {fileName: 'events', data: JSON.stringify(state.events)});
-          await window.recipeApi.writeJSON('events', JSON.stringify(state.events));
+          try {
+            await window.recipeApi.writeJSON('events', JSON.stringify(state.events));
+          } catch (e) {
+              commit('recipeEventsDirty', true);
+              commit('authenticated', false);
+          }
       },
       async storeEvent({ commit, state }, event) {
           commit('storeEvent', event);
-          // await ipcRenderer.invoke('writeJSON', {fileName: 'events', data: JSON.stringify(state.events)});
-          await window.recipeApi.writeJSON('events', JSON.stringify(state.events));
+          try {
+              await window.recipeApi.writeJSON('events', JSON.stringify(state.events));
+          } catch (e) {
+              commit('recipeEventsDirty', true);
+              commit('authenticated', false);
+          }
       },
       async storeRecipe({ commit, state }, recipe) {
           commit('storeRecipe', recipe);
-          console.log(`store: ${JSON.stringify(state.recipes)}`)
-          // await ipcRenderer.invoke('writeJSON', {fileName: 'recipes', data: JSON.stringify(state.recipes)});
-          await window.recipeApi.writeJSON('recipes', JSON.stringify(state.recipes));
+          try {
+              await window.recipeApi.writeJSON('recipes', JSON.stringify(state.recipes));
+          } catch (e) {
+              commit('recipesDirty', true);
+              commit('authenticated', false);
+          }
       },
       async storeRecipeCategory({ commit, state }, recipeCategoryName) {
           commit('storeRecipeCategory', recipeCategoryName);
-          // await ipcRenderer.invoke('writeJSON', {fileName: 'recipe_categories', data: JSON.stringify(state.recipeCategories)});
-          await window.recipeApi.writeJSON('recipe_categories', JSON.stringify(state.recipeCategories));
+          try { 
+              await window.recipeApi.writeJSON('recipe_categories', JSON.stringify(state.recipeCategories));
+          } catch (e) {
+              commit('recipeCategoriesDirty', true);
+              commit('authenticated', false);
+          }
       },
       async updateRecipeCategory({ commit, state}, recipeCategoryData) {
           commit('updateRecipeCategory', recipeCategoryData);
-          // await ipcRenderer.invoke('writeJSON', {fileName: 'recipe_categories', data: JSON.stringify(state.recipeCategories)});
-          await window.recipeApi.writeJSON('recipe_categories', JSON.stringify(state.recipeCategories));
+          try {
+              await window.recipeApi.writeJSON('recipe_categories', JSON.stringify(state.recipeCategories));
+          } catch (e) {
+              commit('recipeCategoriesDirty', true);
+              commit('authenticated', false);
+          }
       },
       async storeIngredient({ commit, state }, { ingredientWithoutCategory, ingredientCategoryId, ingredientStoreId }) {
           commit('storeIngredient', { ingredientWithoutCategory, ingredientCategoryId, ingredientStoreId });
-          // await ipcRenderer.invoke('writeJSON', {fileName: 'ingredients', data: JSON.stringify(state.ingredients)});
-          await window.recipeApi.writeJSON('ingredients', JSON.stringify(state.ingredients));
+          try {
+              await window.recipeApi.writeJSON('ingredients', JSON.stringify(state.ingredients));
+          } catch (e) {
+              commit('ingredientsDirty', true);
+              commit('authenticated', false);
+          }
       },
       async updateIngredient({ commit, state }, ingredient) {
-          commit('updateIngredient', ingredient);
-          // await ipcRenderer.invoke('writeJSON', {fileName: 'ingredients', data: JSON.stringify(state.ingredients)});
-          await window.recipeApi.writeJSON('ingredients', JSON.stringify(state.ingredients));
-          commit('updateRecipes', ingredient);
-          // await ipcRenderer.invoke('writeJSON', {fileName: 'recipes', data: JSON.stringify(state.recipes)});
-          await window.recipeApi.writeJSON('recipes', JSON.stringify(state.recipes));
-          commit('updateRecipeEvents', ingredient);
-          // await ipcRenderer.invoke('writeJSON', {fileName: 'events', data: JSON.stringify(state.events)});
-          await window.recipeApi.writeJSON('events', JSON.stringify(state.events));
+          try {
+              commit('updateIngredient', ingredient);
+              await window.recipeApi.writeJSON('ingredients', JSON.stringify(state.ingredients));
+              commit('updateRecipes', ingredient);
+              await window.recipeApi.writeJSON('recipes', JSON.stringify(state.recipes));
+              commit('updateRecipeEvents', ingredient);
+              await window.recipeApi.writeJSON('events', JSON.stringify(state.events));
+          } catch (e) {
+              commit('ingredientsDirty', true);
+              commit('recipesDirty', true);
+              commit('recipeEventsDirty', true);
+              commit('authenticated', false);
+        }
       },
       async storeIngredientCategory({ commit, state }, ingredientCategoryName) {
           commit('storeIngredientCategory', ingredientCategoryName);
-          // await ipcRenderer.invoke('writeJSON', {fileName: 'ingredient_categories', data: JSON.stringify(state.ingredientCategories)});
-          await window.recipeApi.writeJSON('ingredient_categories', JSON.stringify(state.ingredientCategories));
+          try {
+              await window.recipeApi.writeJSON('ingredient_categories', JSON.stringify(state.ingredientCategories));
+          } catch (e) {
+              commit('ingredientCategoriesDirty', true);
+              commit('authenticated', false);
+          }
       },
       async updateIngredientCategory({ commit, state}, ingredientCategoryData) {
           commit('updateIngredientCategory', ingredientCategoryData);
-          // await ipcRenderer.invoke('writeJSON', {fileName: 'ingredient_categories', data: JSON.stringify(state.ingredientCategories)});
-          await window.recipeApi.writeJSON('ingredient_categories', JSON.stringify(state.ingredientCategories));
+          try {
+              await window.recipeApi.writeJSON('ingredient_categories', JSON.stringify(state.ingredientCategories));
+          } catch (e) {
+              commit('ingredientCategoriesDirty', true);
+              commit('authenticated', false);
+          }
       },
       async storeIngredientStore({ commit, state }, ingredientStoreName) {
           commit('storeIngredientStore', ingredientStoreName);
-          // await ipcRenderer.invoke('writeJSON', {fileName: 'ingredient_stores', data: JSON.stringify(state.ingredientStores)});
-          await window.recipeApi.writeJSON('ingredient_stores', JSON.stringify(state.ingredientStores));
+          try {
+              await window.recipeApi.writeJSON('ingredient_stores', JSON.stringify(state.ingredientStores));
+          } catch (e) {
+              commit('ingredientStoressDirty', true);
+              commit('authenticated', false);
+          }
       },
       async updateRecipeCategory({ commit, state}, ingredientStoreData) {
           commit('updateRecipeCategory', ingredientStoreData);
-          // await ipcRenderer.invoke('writeJSON', {fileName: 'ingredient_stores', data: JSON.stringify(state.ingredientStores)});
-          await window.recipeApi.writeJSON('ingredient_stores', JSON.stringify(state.ingredientStores));
+          try {
+              await window.recipeApi.writeJSON('ingredient_stores', JSON.stringify(state.ingredientStores));
+          } catch (e) {
+              commit('ingredientStoressDirty', true);
+              commit('authenticated', false);
+          }
       },
     },
     /*

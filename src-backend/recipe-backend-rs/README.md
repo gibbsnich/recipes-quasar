@@ -1,0 +1,1 @@
+see https://github.com/minagawah/mini-actix-react-example

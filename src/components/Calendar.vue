@@ -1,4 +1,5 @@
 <template>
+    <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated" />
     <select-recipe-modal :key="selectRecipeKey" v-show="isSelectRecipeModalVisible" @close="closeSelectRecipeModal" v-bind:event="selectRecipeModalEventInfo" />
     <random-ingredients-modal :key="randomIngredientKey" v-show="isRandomIngredientsModalVisible" @close="closeRandomIngredientsModal" v-bind:date="randomIngredientsDate" />
     <ingredient-without-category-modal v-show="isIngredientWithoutCategoryModalVisible" @close="closeIngredientsWithoutCategoryModal" v-bind:ingredient="ingredientWithoutCategory" />
@@ -17,6 +18,7 @@ import SelectRecipeModal from './SelectRecipeModal.vue';
 import RandomIngredientsModal from './RandomIngredientsModal.vue';
 import { UnknownIngredientsMixin } from './UnknownIngredientsMixin.js';
 import IngredientWithoutCategoryModal from './IngredientWithoutCategoryModal.vue';
+import LoginModal from './web/LoginModal.vue';
 import { dateToString } from '../util/date.js';
 import { generatePDF } from '../util/generatePDF.js';
 
@@ -26,6 +28,7 @@ export default defineComponent({
         SelectRecipeModal,
         RandomIngredientsModal,
         IngredientWithoutCategoryModal,
+        LoginModal,
     },
     mixins: [UnknownIngredientsMixin],
     data() {
