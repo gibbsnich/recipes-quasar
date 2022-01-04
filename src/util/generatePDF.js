@@ -19,7 +19,9 @@ export const generatePDF = ({start, end}, store) => {
     extraEvents.forEach((i) => i.forEach((ii) => allIngredientsPerRecipe.push(ii)));
     const allIngredients = allIngredientsPerRecipe.reduce((memo, i) => {
         if (memo[i.ingredient]) {
-            memo[i.ingredient].amount = `${memo[i.ingredient].amount} + ${i.amount}`;
+            if (i.amount !== '') {
+                memo[i.ingredient].amount = `${memo[i.ingredient].amount} + ${i.amount}`;
+            }
         } else {
             memo[i.ingredient] = {amount: i.amount, store: i.storeId, category: i.categoryId};
         }
