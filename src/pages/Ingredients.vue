@@ -3,7 +3,8 @@
     <settings-menu activeTab="ingredients" />
     <div class="container">
         <h4>Zutaten</h4>
-        <ingredients-settings-table v-bind:categoryItemsGetter="getSortedIngredients" v-bind:refresh="this.$store.state.isInitialized" />
+        <ingredients-settings-table v-if="getSortedIngredients.length > 0" v-bind:categoryItemsGetter="getSortedIngredients" v-bind:refresh="this.$store.state.isInitialized" />
+        <h6 v-else>Keine Zutaten</h6>
     </div>
 </template>
 
@@ -27,3 +28,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+  h6 {
+    margin-left: 1rem;
+  }
+</style>
