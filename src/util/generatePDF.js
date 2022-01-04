@@ -71,7 +71,11 @@ export const generatePDF = ({start, end}, store) => {
             doc.addPage();
             doc.setFontSize('14');
             doc.text(readableDate + ' ' + time, 40, 10);
-            doc.text(`${currentRecipe.name} (${currentRecipe.serving.value} ${currentRecipe.serving.type})`, 10, 20);
+            if (currentRecipe.serving.value !== '' && currentRecipe.serving.type !== '') {
+                doc.text(`${currentRecipe.name} (${currentRecipe.serving.value} ${currentRecipe.serving.type})`, 10, 20);
+            } else {
+                doc.text(`${currentRecipe.name}`, 10, 20);
+            }
             doc.setFontSize('11');
             doc.text(currentRecipe.url, 10, 30);
             doc.setFontSize('14');
