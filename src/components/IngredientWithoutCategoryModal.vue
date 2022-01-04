@@ -16,9 +16,9 @@
                                 <label class="form-check-label" :for="'radio_' + ingredientCategory.id">{{ ingredientCategory.name }}</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="categoryOptions" id="radio_new" value="new" v-model="pickedCategory">
+                                <input class="form-check-input" type="radio" name="categoryOptions" id="radio_new" value="new" v-model="pickedCategory" v-on:change="this.focusInput($event, 'newCategoryInput')">
                                 ... oder neu anlegen:
-                                <input type="text" placeholder="Neue Kategorie" v-model="newCategoryName">
+                                <input type="text" placeholder="Neue Kategorie" ref="newCategoryInput" v-model="newCategoryName" v-on:focus="this.pickedCategory = 'new'">
                             </div>
                         </div>
                     </div>
@@ -30,9 +30,9 @@
                                 <label class="form-check-label" :for="'radio_store_' + ingredientStore.id">{{ ingredientStore.name }}</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="storeOptions" id="radio_new_store" value="new" v-model="pickedStore">
+                                <input class="form-check-input" type="radio" name="storeOptions" id="radio_new_store" value="new" v-model="pickedStore" v-on:change="this.focusInput($event, 'newStoreInput')">
                                 ... oder neu anlegen:
-                                <input type="text" placeholder="Neuer Laden" v-model="newStoreName">
+                                <input type="text" placeholder="Neuer Laden" ref="newStoreInput" v-model="newStoreName" v-on:focus="this.pickedStore = 'new'">
                             </div>
                         </div>
                     </div>
@@ -85,6 +85,11 @@ export default defineComponent({
         },
     },
     methods: {
+        focusInput(evt, name) {
+            if (evt.target.value === 'new') {
+                this.$refs[name].focus()
+            }
+        },
         close() {
             if (this.pickedCategory && this.pickedStore) {
                 const selection = {};
