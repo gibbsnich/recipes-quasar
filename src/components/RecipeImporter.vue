@@ -3,7 +3,7 @@
         <div class="card-header">Von URL importieren</div>
         <div class="card-body">
             <input id="url-input" type="text" class="form-control" placeholder="URL" v-model="recipeUrl" />
-            <button id="import-button" type="button" class="btn btn-primary" @click="startImport">Importieren</button>
+            <button id="import-button" type="button" class="btn btn-primary" @click="startImport" :disabled="recipeUrl === ''">Importieren</button>
         </div>
     </div>
 </template>
@@ -22,9 +22,6 @@ export default defineComponent({
     },
     methods: {
         async startImport() {
-            if (!this.recipeUrl || this.recipeUrl.length === 0) {
-                this.recipeUrl = 'https://www.chefkoch.de/rezepte/4045411625126577/Curry-Blumenkohl.html';
-            }
             const existingRecipe = this.$store.getters.getRecipeByUrl(this.recipeUrl);
             if (existingRecipe) {
                 this.$emit('recipeImported', existingRecipe);
