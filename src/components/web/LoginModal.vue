@@ -65,6 +65,14 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-sm-3">
+                                <label for="email-input" class="col-form-label">Email:</label>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" name="email-input" placeholder="Email-Adresse" v-model="email">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
                                 <label for="invite-input" class="col-form-label">Einladecode:</label>
                             </div>
                             <div class="col-sm-9">
@@ -76,7 +84,7 @@
                 <div class="modal-footer">
                     <button v-show="activeTab === 'login'" type="button" class="btn btn-primary" @click="login" :disabled="name === '' || password === ''">Anmelden</button>
                     <button v-show="activeTab === 'register'" type="button" class="btn btn-primary" @click="register" 
-                        :disabled="name === '' || password === '' || invitationCode === '' || passwordRepeat === ''">Registrieren</button>
+                        :disabled="name === '' || password === '' || invitationCode === '' || passwordRepeat === '' || email == ''">Registrieren</button>
                 </div>
             </div>
         </div>
@@ -88,13 +96,13 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'LoginModal',
-    //emits: ['close'],
     data() {
         return {
             activeTab: 'login',
             name: '',
             password: '',
             passwordRepeat: '',
+            email: '',
             invitationCode: '',
             loginError: '',
             registerError: '',
@@ -138,11 +146,22 @@ export default defineComponent({
                 body: JSON.stringify({
                     login_id: this.name, 
                     password: this.password, 
+                    email: this.email,
                     invitation_code: this.invitationCode,
                 })
-            })
+            });
             if (response.status > 400) {
-                this.registerError = 'Registrierung fehlgeschlagen';
+                const errDetails = await response.json();
+                let msg = '';
+                if (errDetails.error) {
+                    msg = ' (' + {
+                        'Username taken': 'Benutzername vergeben',
+                        'Password too short': 'Passwort muss mindestens 12 Zeichen lang sein',
+                        'Invalid email': 'Ungültige Email-Adresse',
+                        'Invalid invitation code': 'Ungültiger Einladecode'
+                    }[errDetails.error] + ')';
+                }
+                this.registerError = `Registrierung fehlgeschlagen${msg}`;
             } else {
                 this.registerError = '';
                 this.$store.commit('authenticated', true);

@@ -9,10 +9,13 @@ use uuid::Uuid;
 extern crate fs2;
 use fs2::FileExt;
 
+use crate::lib::error::Error;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SignupEntry {
     login_id: String,
     password: String,
+    email: String,
     invitation_code: String,
 }
 
@@ -36,6 +39,7 @@ struct InvitationCode {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 struct StoredUser {
     login_id: String,
+    email: String,
     uuid: String,
     pass_hash: String,
 }
@@ -91,7 +95,7 @@ fn check_password(users: &Vec<StoredUser>, login_id: String, password: String) -
     )
 }
 
-pub async fn signup(id: Identity, signup_entry: web::Json<SignupEntry>) -> impl Responder {
+pub async fn signup(id: Identity, signup_entry: web::Json<SignupEntry>) -> Result<web::Json<User>, Error> {
     println!("[user] ++++ signup()");
     let login_id = signup_entry.login_id.clone();
     println!("[user] login_id: {}", login_id);
@@ -100,26 +104,47 @@ pub async fn signup(id: Identity, signup_entry: web::Json<SignupEntry>) -> impl 
 
     if check_login_id_available(&existing_users, login_id.clone()) {
         println!("[user] existing user name: {}", login_id);
-        return HttpResponse::Unauthorized().finish();
+        return Err(Error {
+            message: "Username taken".into(),
+            status: 401,
+        });
     }
 
+    if signup_entry.password.len() < 12 {
+        println!("[user] password too short: {}", signup_entry.password);
+        return Err(Error {
+            message: "Password too short".into(),
+            status: 401,
+        });
+    }
+    if !signup_entry.email.contains("@") {
+        println!("[user] invalid email: {}", signup_entry.email);
+        return Err(Error {
+            message: "Invalid email".into(),
+            status: 401,
+        });
+    }
     if !check_invitation_code(&invitation_code).await {
         println!("[user] invalid invitation code: {}", invitation_code);
-        return HttpResponse::Unauthorized().finish();
+        return Err(Error {
+            message: "Invalid invitation code".into(),
+            status: 401,
+        });
     }
     let mut new_users = existing_users.clone();
     let uuid = Uuid::new_v4();
     new_users.push(StoredUser {
         login_id: login_id.clone(),
+        email: signup_entry.email.clone(),
         pass_hash: bcrypt::hash(&signup_entry.password).unwrap(),
         uuid: uuid.to_string(),
     });
     store_users(new_users).await.unwrap();
     id.remember(uuid.to_string().to_owned());
-    HttpResponse::Ok().json(User {
+    Ok(web::Json(User {
         id: login_id.into(),
         //description: "perfect".into(),
-    })
+    }))
 }
 
 /*

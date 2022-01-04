@@ -234,7 +234,6 @@ export default store(function (/* { ssrContext } */) {
   },
   actions: {
       async loadInitialData({ commit, state }) {
-          debugger;
           if (!state.isInitialized) {
             try {
                 commit('initStore', {
