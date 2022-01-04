@@ -9,7 +9,7 @@
         <tbody>
             <tr v-for="(category, index) in categories" v-bind:key="category.id">
                 <td>
-                    <input type="text" class="form-control" v-model="category.name" @change="updateDirty(index)"/>
+                    <input type="text" class="form-control" v-model="category.name" @keyup="updateDirty(index)"/>
                 </td>
                 <td>
                     <button type="button" class="btn btn-success btn-sm" aria-label="Save" @click="save(index)" :disabled="!dirtyCategories[index]">
@@ -30,6 +30,14 @@ export default defineComponent({
   props: {
         name: String,
         categoryItemsGetter: Function,
+        refresh: Boolean,
+  },
+  watch: {
+      refresh(val) {
+        this.categories = JSON.parse(JSON.stringify(this.categoryItemsGetter()));
+        this.originalCategories = JSON.parse(JSON.stringify(this.categoryItemsGetter()));
+        this.dirtyCategories = [];
+      },
   },
   data() {
     return {

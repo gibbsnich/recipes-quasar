@@ -3,9 +3,9 @@
     <settings-menu activeTab="categories" />
     <div class="container">
         <h4>Kategorien</h4>
-        <category-table name="Rezeptkategorie" @save="saveRecipeCategory" v-bind:categoryItemsGetter="getSortedRecipeCategories" />
-        <category-table name="Zutatenkategorie" @save="saveIngredientCategory" v-bind:categoryItemsGetter="getSortedIngredientCategories" />
-        <category-table name="Zutatenladen" @save="saveIngredientStore" v-bind:categoryItemsGetter="getSortedIngredientStores" />
+        <category-table name="Rezeptkategorie" v-show="getSortedRecipeCategories().length > 0" @save="saveRecipeCategory" v-bind:categoryItemsGetter="getSortedRecipeCategories" v-bind:refresh="this.$store.state.isInitialized" />
+        <category-table name="Zutatenkategorie" v-show="getSortedIngredientCategories().length > 0" @save="saveIngredientCategory" v-bind:categoryItemsGetter="getSortedIngredientCategories" v-bind:refresh="this.$store.state.isInitialized" />
+        <category-table name="Zutatenladen" v-show="getSortedIngredientStores().length > 0" @save="saveIngredientStore" v-bind:categoryItemsGetter="getSortedIngredientStores" v-bind:refresh="this.$store.state.isInitialized" />
     </div>
 </template>
 

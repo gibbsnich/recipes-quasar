@@ -23,10 +23,14 @@
                 {{ recipeCategory.name }}
             </button>
         </div>
-        <div>
-            ... oder neu anlegen:
-            <input type="text" placeholder="Neue Kategorie" v-model="newRecipeCategoryName">
-            <button type="button" id="save-recipe-category-button" :class="['btn', 'btn-primary', {disabled: newRecipeCategoryName.length === 0 || this.$store.getters.getRecipeCategoryByName(newRecipeCategoryName)}]" @click="saveNewRecipeCategory">Speichern</button>
+        <div class="row mb-3">
+            <div class="col-sm-3">... oder neu anlegen:</div>
+            <div class="col-sm-7">
+                <input type="text" class="form-control" placeholder="Neue Kategorie" v-model="newRecipeCategoryName">
+            </div>
+            <div class="col-sm-1">
+                <button type="button" id="save-recipe-category-button" :class="['btn', 'btn-primary', {disabled: newRecipeCategoryName.length === 0 || this.$store.getters.getRecipeCategoryByName(newRecipeCategoryName)}]" @click="saveNewRecipeCategory">Speichern</button>
+            </div>
         </div>
     </div>
     <div class="row mb-3">
