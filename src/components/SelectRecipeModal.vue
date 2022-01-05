@@ -15,10 +15,26 @@
                 <accordion v-bind:categories="this.$store.getters.getSortedRecipeCategories" v-bind:categoryItemsGetter="this.getRecipes"
                     restCategoryName="Ohne Kategorie" v-bind:restCategoryItems="this.$store.getters.getSortedRecipesWithoutCategory" @itemSelected="recipeSelected" />
             </div>
+            <div class="recipe card" v-if="this.currentRecipe">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">{{ this.currentRecipe.name }}</h6>
+                    <div v-if="this.currentRecipe.serving.value !== '' && this.currentRecipe.serving.type !== ''">
+                        {{ this.currentRecipe.serving.value }} {{ this.currentRecipe.serving.type }}
+                    </div>
+                    <div class="ingredients">
+                        <ul class="list-group list-group-horizontal" v-for="i in Math.ceil(this.currentRecipe.ingredients.length / 2)" v-bind:key="i">
+                            <li class="list-group-item" v-for="ingredient in this.currentRecipe.ingredients.slice((i - 1) * 2, i * 2)" v-bind:key="ingredient.id">
+                                <span v-if="ingredient.amount">{{ ingredient.amount }}</span> <span>{{ ingredient.ingredient }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>{{ currentRecipe.preparation }}</div>
+                </div>
+            </div>
         </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-primary" @click="close">Speichern</button>
-        </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @click="close">Speichern</button>
+            </div>
         </div>
     </div>
     </div>
@@ -38,6 +54,17 @@ export default defineComponent({
     data() {
         return {
             selectedRecipeId: null,
+        }
+    },
+    computed: {
+        currentRecipe: {
+            get() {
+                if (!this.event || !this.event.extendedProps.recipeId)
+                    return null;
+                if (this.selectedRecipeId) 
+                    return this.$store.getters.getRecipeById(this.selectedRecipeId);
+                return this.$store.getters.getRecipeById(this.event.extendedProps.recipeId);
+            }
         }
     },
     methods: {
@@ -60,5 +87,15 @@ export default defineComponent({
 <style scoped>
   .modal {
     display: block;
+  }
+  div.recipe {
+      margin-top: 1rem;
+  }
+  div.ingredients {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+  }
+  ul.list-group {
+      margin-top: .2rem;
   }
 </style>
