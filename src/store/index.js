@@ -149,9 +149,7 @@ export default store(function (/* { ssrContext } */) {
               ingredientWithoutCategory.id = newIngredientId;
               ingredientWithoutCategory.categoryId = ingredientCategoryId;
               ingredientWithoutCategory.storeId = ingredientStoreId;
-              if (Object.hasOwnProperty(ingredientWithoutCategory, 'amount')) {
-                  delete ingredientWithoutCategory.amount;
-              }
+              delete ingredientWithoutCategory.amount;
               state.ingredients.push(ingredientWithoutCategory);
           }
       },
