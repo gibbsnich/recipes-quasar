@@ -31,7 +31,7 @@
                                 <label for="pass-input" class="col-form-label">Passwort:</label>
                             </div>
                             <div class="col-sm-9">
-                                <input type="password" class="form-control" name="pass-input" placeholder="Passwort" v-model="password">
+                                <input type="password" class="form-control" name="pass-input" placeholder="Passwort" v-model="password" @keydown.enter="login">
                             </div>
                         </div>
                     </div>
@@ -113,6 +113,9 @@ export default defineComponent({
             this.activeTab = tabName;
         },
         async login() {
+            if (this.name === '' || this.password === '') {
+                return;
+            }
             const response = await fetch(`${process.env.API}/api/auth`, {
                 method: 'POST',
                 credentials: 'include',
