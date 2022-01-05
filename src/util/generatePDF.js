@@ -4,22 +4,16 @@ import jsPDF, { AcroFormCheckBox } from 'jspdf';
 
 const MAX_PAGE_Y = 290;
 
-export const generatePDF = ({start, end}, store) => {
-    const doc = new jsPDF();
-
-    const   startStr = dateToString(start),
-            endStr = dateToString(end);
-
-    const currentEvents = store.state.events.filter((e) => e.start && e.start >= startStr && e.start <= endStr).map((e) => toRaw(e));
+export const generateIngredientData = ({start, end}, store) => {
+    const currentEvents = store.state.events.filter((e) => e.start && e.start >= start && e.start <= end).map((e) => toRaw(e));
     //can contain multiple instances of the same recipe!
     const currentRecipes = currentEvents.filter((e) => !e.extendedProps.extra).map((e) => toRaw(store.state.recipes.filter((r) => r.id === e.extendedProps.recipeId)[0]));
-
     const allIngredientsPerRecipe = currentRecipes.map((r) => r.ingredients).flat(2);
     const extraEvents = currentEvents.filter((e) => e.extendedProps.extra).map((e) => e.extendedProps.ingredients);
     extraEvents.forEach((i) => i.forEach((ii) => allIngredientsPerRecipe.push(ii)));
     const allIngredients = allIngredientsPerRecipe.reduce((memo, i) => {
         if (memo[i.ingredient]) {
-            if (i.amount !== '') {
+            if (i.amount && i.amount !== '') {
                 memo[i.ingredient].amount = `${memo[i.ingredient].amount} + ${i.amount}`;
             }
         } else {
@@ -27,11 +21,15 @@ export const generatePDF = ({start, end}, store) => {
         }
         return memo;
     }, {});
+    return { allIngredients, currentEvents, ingredientKeys: Object.keys(allIngredients).sort((a, b) => a < b ? -1 : (b < a ? 1 : 0)) };
+};
 
+export const generatePDF = ({start, end}, store) => {
+    const { allIngredients, currentEvents, ingredientKeys } = generateIngredientData({start: dateToString(start), end: dateToString(end)}, store);
+    const doc = new jsPDF();
     doc.setFontSize('16');
     doc.text('Einkaufsliste', 60, 10);
     doc.setFontSize('12');
-    const ingredientKeys = Object.keys(allIngredients).sort((a, b) => a < b ? -1 : (b < a ? 1 : 0));
     let y = 20;
     const stores = store.getters.getSortedIngredientStores;
     const categories = store.getters.getSortedIngredientCategories;
@@ -52,7 +50,7 @@ export const generatePDF = ({start, end}, store) => {
                         y = 10;
                         doc.addPage();
                     }
-                    const text = allIngredients[i].amount.length > 0 ? `${allIngredients[i].amount} ${i}` : i;
+                    const text = allIngredients[i].amount && allIngredients[i].amount.length > 0 ? `${allIngredients[i].amount} ${i}` : i;
                     const checkbox = new AcroFormCheckBox();
                     checkbox.appearanceState = 'Off';
                     checkbox.fieldName = text;
@@ -108,5 +106,5 @@ export const generatePDF = ({start, end}, store) => {
             
         }
     });
-    doc.save(`Rezepte_${startStr}.pdf`);
+    doc.save(`Rezepte_${dateToString(start)}.pdf`);
 };

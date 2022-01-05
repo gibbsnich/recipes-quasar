@@ -40,7 +40,7 @@ export default defineComponent({
                 //slotDuration: "02:00:00",
                 initialView: 'timeGridWeek',
                 headerToolbar: {
-                    left: 'prev,next today gotoRecipesButton generatePDFButton',
+                    left: 'prev,next today gotoRecipesButton generatePDFButton generateIngredientListButton',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek'
                 },
@@ -58,7 +58,15 @@ export default defineComponent({
                                 generatePDF(this.currentSelection, this.$store);
                             }
                         }
-                    }
+                    },
+                    generateIngredientListButton: {
+                        text: 'Einkaufsliste erzeugen',
+                        click: () => {
+                            if (this.currentSelection) {
+                                this.$router.push(`/ingredient-list/${dateToString(this.currentSelection.start)}/${dateToString(this.currentSelection.end)}`);
+                            }
+                        }
+                    },
                 },
                 eventClick: this.handleEventClick,
                 editable: true,
