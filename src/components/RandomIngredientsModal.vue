@@ -14,11 +14,11 @@
                         <p>Zutaten auswählen:</p>
                         <accordion v-bind:categories="this.$store.getters.getSortedIngredientCategories" v-bind:categoryItemsGetter="getIngredients"
                             @itemSelected="addIngredientById" v-slot:default="slotProps">
-                                <button type="button" class="btn btn-outline-primary btn-ing"
-                                    @click="this.addIngredientById(item.id)"
-                                    v-for="item in this.getIngredients(slotProps.category.id)" v-bind:key="item.id">
-                                    {{ item.ingredient }}
-                                </button>
+                            <button type="button" class="btn btn-outline-primary btn-ing"
+                                @click="this.addIngredientById(item.id)"
+                                v-for="item in this.getIngredients(slotProps.category.id)" v-bind:key="item.id">
+                                {{ item.ingredient }}
+                            </button>
                         </accordion>
                     </div>
                     <p>Gewählte Zutaten:</p>

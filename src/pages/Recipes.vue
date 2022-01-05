@@ -6,11 +6,23 @@
         <div class="row">
             <div class="col-sm-3">
                 <h6>Vorhandene Rezepte:</h6>
-                <div class="list-group">
-                    <button type="button" v-for="recipe in this.$store.state.recipes" v-bind:key="recipe.id" 
-                            :class="['list-group-item', 'list-group-item-action', {active: recipeId === recipe.id}]"
-                            @click="selectRecipe(recipe.id)">{{ recipe.name }}</button>
-                </div>
+                <accordion v-bind:categories="this.$store.getters.getSortedRecipeCategories" v-bind:categoryItemsGetter="this.getRecipes"
+                    restCategoryName="Ohne Kategorie" v-bind:restCategoryItems="this.$store.getters.getSortedRecipesWithoutCategory" @itemSelected="selectRecipe">
+                    <template v-slot:default="slotProps">
+                        <div class="list-group">
+                            <button type="button" v-for="recipe in this.$store.getters.getSortedRecipes(slotProps.category.id)" v-bind:key="recipe.id" 
+                                    :class="['list-group-item', 'list-group-item-action', {active: recipeId === recipe.id}]"
+                                    @click="selectRecipe(recipe.id)">{{ recipe.name }}</button>
+                        </div>
+                    </template>
+                    <template v-slot:rest="restProps">
+                        <div class="list-group">
+                            <button type="button" v-for="recipe in restProps.items" v-bind:key="recipe.id"
+                                    :class="['list-group-item', 'list-group-item-action', {active: recipeId === recipe.id}]"
+                                    @click="selectRecipe(recipe.id)">{{ recipe.name }}</button>
+                        </div>
+                    </template>
+                </accordion>
                 <ul class="list-group" id="action-group">
                     <li class="list-group-item">
                         <button type="button" class="btn btn-primary" @click="addRecipe" >Rezept anlegen</button>
@@ -38,6 +50,7 @@ import { UnknownIngredientsMixin } from '../components/UnknownIngredientsMixin.j
 import IngredientWithoutCategoryModal from '../components/IngredientWithoutCategoryModal.vue';
 import SettingsMenu from '../components/SettingsMenu.vue';
 import LoginModal from '../components/web/LoginModal.vue';
+import Accordion from '../components/Accordion.vue';
 
 export default defineComponent({
   name: 'recipes',
@@ -47,6 +60,7 @@ export default defineComponent({
     IngredientWithoutCategoryModal,
     SettingsMenu,
     LoginModal,
+    Accordion,
   },
   mixins: [UnknownIngredientsMixin],
   data() {
@@ -93,6 +107,9 @@ export default defineComponent({
       finishedHandlingUnknownIngredients() {
           this.$store.dispatch('storeRecipe', this.savedRecipe);
           this.savedRecipe = null;
+      },
+      getRecipes(recipeCategoryId) {
+          return this.$store.getters.getSortedRecipes(recipeCategoryId);
       },
   }
 });
