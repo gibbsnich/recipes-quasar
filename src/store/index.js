@@ -394,6 +394,15 @@ export default store(function (/* { ssrContext } */) {
               commit('authenticated', false);
           }
       },
+      async updateIngredientStore({ commit, state }, ingredientStoreData) {
+          commit('updateIngredientStore', ingredientStoreData);
+          try {
+              await window.recipeApi.writeJSON('ingredient_store', JSON.stringify(state.ingredientStores));
+          } catch (e) {
+              commit('ingredientStoresDirty', false);
+              commit('authenticated', false);
+          }
+      },
       async updateRecipeCategory({ commit, state}, ingredientStoreData) {
           commit('updateRecipeCategory', ingredientStoreData);
           try {
