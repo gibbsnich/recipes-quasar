@@ -9,7 +9,8 @@
                 </h2>
                 <div :class="['accordion-collapse', 'collapse', {show: category.id === expandedCategoryId}]">
                     <div class="accordion-body">
-                        <slot :category="category">
+                        <div v-if="categoryItemsGetter(category.id).length === 0">Keine Einträge</div>
+                        <slot v-else :category="category">
                             <select class="form-select" aria-label="Rezeptauswahl" @change="itemSelected">
                                 <option value="-1">Rezept wählen..</option>
                                 <option v-for="item in categoryItemsGetter(category.id)" :value="item.id" v-bind:key="item.id">
@@ -30,7 +31,8 @@
                 </h2>
                 <div :class="['accordion-collapse', 'collapse', {show: -1 === expandedCategoryId}]">
                     <div class="accordion-body">
-                        <slot name="rest" :items="restCategoryItems">
+                        <div v-if="restCategoryItems.length === 0">Keine Einträge</div>
+                        <slot v-else name="rest" :items="restCategoryItems">
                             <select class="form-select" aria-label="Rezeptauswahl" @change="itemSelected">
                                 <option value="-1">Rezept wählen..</option>
                                 <option v-for="item in restCategoryItems" :value="item.id" v-bind:key="item.id">
