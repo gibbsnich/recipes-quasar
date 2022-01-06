@@ -3,6 +3,8 @@ use std::fs::{ File, OpenOptions };
 use std::io::{ BufWriter, Write };
 use actix_identity::Identity;
 use actix_web::{ web, HttpResponse, Responder };
+use sanitize_html::sanitize_str;
+use sanitize_html::rules::predefined::DEFAULT;
 use serde::{ Deserialize, Serialize };
 use pwhash::bcrypt;
 use uuid::Uuid;
@@ -134,8 +136,8 @@ pub async fn signup(id: Identity, signup_entry: web::Json<SignupEntry>) -> Resul
     let mut new_users = existing_users.clone();
     let uuid = Uuid::new_v4();
     new_users.push(StoredUser {
-        login_id: login_id.clone(),
-        email: signup_entry.email.clone(),
+        login_id: sanitize_str(&DEFAULT, &login_id).unwrap(),
+        email: sanitize_str(&DEFAULT, &signup_entry.email).unwrap(),
         pass_hash: bcrypt::hash(&signup_entry.password).unwrap(),
         uuid: uuid.to_string(),
     });

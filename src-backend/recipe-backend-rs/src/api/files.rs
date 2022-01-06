@@ -1,10 +1,13 @@
 use std::io::{ Read, Write };
 use std::fs::{ File, OpenOptions };
 use std::path::Path;
+use std::str;
 use actix_identity::Identity;
 use actix_web::{ web, HttpResponse, Responder };
 extern crate fs2;
 use fs2::FileExt;
+use sanitize_html::sanitize_str;
+use sanitize_html::rules::predefined::DEFAULT;
 
 const FILENAMES: &'static [&'static str] = &["ingredients", "ingredient_categories", "ingredient_stores", "events", "recipes", "recipe_categories"];
 
@@ -53,7 +56,7 @@ pub async fn write(id: Identity, file_name: web::Path<String>, body: web::Bytes)
                 .truncate(true)
                 .open(&path).unwrap();
             file.lock_exclusive().unwrap();
-            file.write_all(&body).unwrap();
+            file.write_all(&sanitize_str(&DEFAULT,  str::from_utf8(&body).unwrap()).unwrap().as_bytes()).unwrap();
             file.unlock().unwrap();
         } else {
             return HttpResponse::NotFound().finish();
