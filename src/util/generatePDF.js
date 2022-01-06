@@ -14,10 +14,17 @@ export const generateIngredientData = ({start, end}, store) => {
     const allIngredients = allIngredientsPerRecipe.reduce((memo, i) => {
         if (memo[i.ingredient]) {
             if (i.amount && i.amount !== '') {
-                memo[i.ingredient].amount = `${memo[i.ingredient].amount} + ${i.amount}`;
+                if (memo[i.ingredient].amount) {
+                    memo[i.ingredient].amount = `${memo[i.ingredient].amount} + ${i.amount}`;
+                } else {
+                    memo[i.ingredient].amount = `${i.amount}`;
+                }
             }
         } else {
-            memo[i.ingredient] = {amount: i.amount, store: i.storeId, category: i.categoryId};
+            memo[i.ingredient] = {store: i.storeId, category: i.categoryId};
+            if (i.amount) {
+                memo.amount = i.amount;
+            }
         }
         return memo;
     }, {});
