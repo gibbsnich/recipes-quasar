@@ -23,7 +23,7 @@ export const generateIngredientData = ({start, end}, store) => {
         } else {
             memo[i.ingredient] = {store: i.storeId, category: i.categoryId};
             if (i.amount) {
-                memo.amount = i.amount;
+                memo[i.ingredient].amount = i.amount;
             }
         }
         return memo;
