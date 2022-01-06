@@ -28,7 +28,7 @@
                             </li>
                         </ul>
                     </div>
-                    <div>{{ currentRecipe.preparation }}</div>
+                    <div v-html="currentRecipe.preparation.replaceAll('\n', '<br/>')"></div>
                 </div>
             </div>
         </div>
