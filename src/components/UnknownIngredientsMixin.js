@@ -32,8 +32,9 @@ export const UnknownIngredientsMixin = {
                     selectedCategories.storeId = ingredientStores[0].id;
                 }
             }
-
+            const amount = this.ingredientWithoutCategory.amount;
             this.$store.dispatch('storeIngredient', {ingredientWithoutCategory: this.ingredientWithoutCategory, ingredientCategoryId: selectedCategories.categoryId, ingredientStoreId: selectedCategories.storeId});
+            this.ingredientWithoutCategory.amount = amount;
             const withoutCategory = this.checkForIngredientsWithoutCategory(this.unknownIngredients);
             if (withoutCategory) {
                 this.ingredientWithoutCategory = withoutCategory;

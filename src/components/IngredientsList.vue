@@ -2,10 +2,10 @@
     <ul class="list-group list-group-flush">
         <li class="list-group-item" v-for="(ingredient, index) in ingredients" v-bind:key="index">
             <div class="input-group">
-                <input type="text"  class="form-control" placeholder="Menge" aria-label="Menge" v-model="ingredient.amount">
+                <input type="text"  class="form-control" placeholder="Menge" aria-label="Menge" v-model.trim="ingredient.amount">
                 <div class="dropdown">
                     <input type="text" :id="`dd_${index}`" :class="['form-control', 'dropdown-toggle', {unknown: !ingredient.id}]" placeholder="Zutat" aria-label="Zutat" data-bs-toggle="dropdown" 
-                        v-model="ingredient.ingredient" v-on:blur="ingredientChanged(index, $event)" 
+                        v-model.trim="ingredient.ingredient" v-on:blur="ingredientChanged(index, $event)" 
                         v-on:keyup="maybeShowIngredients(index, $event)">
                     <ul class="dropdown-menu" v-show="Object.keys(dropDownIngredients).includes(`${index}`) && dropDownIngredients[index].length > 0">
                         <li v-for="ddingredient in dropDownIngredients[index]" v-bind:key="ddingredient.id" :aria-labelledby="`dd_${index}`">
@@ -20,10 +20,10 @@
         </li>
         <li class="list-group-item">
             <div class="input-group">
-                <input type="text" class="form-control" placeholder="Menge" aria-label="Menge" v-model="newIngredient.amount">
+                <input type="text" class="form-control" placeholder="Menge" aria-label="Menge" v-model.trim="newIngredient.amount">
                 <div class="dropdown">
                     <textarea type="text" id="dd_new" :class="['form-control', 'dropdown-toggle', {unknown: !newIngredient.id}]" placeholder="Zutat" aria-label="Zutat" data-bs-toggle="dropdown" 
-                        v-model="newIngredient.ingredient" v-on:keyup="maybeShowIngredients(-1, $event)" rows="1" />
+                        v-model.trim="newIngredient.ingredient" v-on:keyup="maybeShowIngredients(-1, $event)" rows="1" />
                     <ul class="dropdown-menu" v-show="newIngredientDropDownIngredients.length > 0">
                         <li v-for="ddingredient in newIngredientDropDownIngredients" v-bind:key="ddingredient.id" aria-labelledby="dd_new">
                             <a class="dropdown-item" href="javascript:void(0)" v-on:click="newIngredient.ingredient = ddingredient.ingredient"><span v-html="ddingredient.highlight"></span></a>
@@ -99,10 +99,9 @@ export default defineComponent({
             this.newIngredientDropDownIngredients = [];
         },
         addIngredient() {
+            this.newIngredient.ingredient = this.newIngredient.ingredient.trim();
             if (this.newIngredient.ingredient !== '') {
-                if (Object.hasOwnProperty(this.newIngredient, 'highlight')) {
-                    delete this.newIngredient.highlight;
-                }
+                delete this.newIngredient.highlight;
                 if (this.newIngredient.ingredient.indexOf("\n") === -1) {
                     // eslint-disable-next-line
                     this.ingredients.push(this.newIngredient);
@@ -111,9 +110,9 @@ export default defineComponent({
                     const newIngredients = this.newIngredient.ingredient.split("\n").filter(l => l.length > 0).map(l => { 
                         const lineSplit = l.split(' ');
                         if (lineSplit.length > 1) {
-                            return {amount: lineSplit[0], ingredient: lineSplit.splice(1, lineSplit.length-1).join(' ')};
+                            return {amount: lineSplit[0], ingredient: lineSplit.splice(1, lineSplit.length-1).join(' ').trim()};
                         }
-                        return {amount: '', ingredient: l};
+                        return {amount: '', ingredient: l.trim()};
                     });
                     this.ingredients.push.apply(this.ingredients, newIngredients);
                     newIngredients.forEach((v, i) => this.checkExistingIngredient(this.ingredients.length - i - 1));
