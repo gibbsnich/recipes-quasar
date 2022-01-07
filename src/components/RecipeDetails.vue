@@ -23,7 +23,7 @@
                 {{ recipeCategory.name }}
             </button>
         </div>
-        <div class="row mb-3">
+        <div class="row mb-3 mt-3">
             <div class="col-sm-3">... oder neu anlegen:</div>
             <div class="col-sm-7">
                 <input type="text" class="form-control" placeholder="Neue Kategorie" v-model.trim="newRecipeCategoryName">
