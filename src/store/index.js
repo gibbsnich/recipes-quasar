@@ -45,13 +45,7 @@ export default store(function (/* { ssrContext } */) {
           shoppingLists: [],
           isInitialized: false,
           isAuthenticated: true,
-          isRecipeEventDirty: false,
-          isRecipesDirty: false,
-          isRecipeCategoriesDirty: false,
-          isIngredientsDirty: false,
-          isIngredientCategoriesDirty: false,
-          isIngredientStoreDirty: false,
-          isShoppingListDirty: false,
+          dirtyValues: [],
       }
   },
   getters: {
@@ -235,27 +229,17 @@ export default store(function (/* { ssrContext } */) {
       initialized(state, isInit) {
           state.isInitialized = isInit;
       },
-      recipeEventsDirty(state, isDirty) {
-          state.isRecipeEventDirty = isDirty;
+      dirty(state, entityType) {
+          if (state.dirtyValues.indexOf(entityType) === -1) {
+            state.dirtyValues.push(entityType);
+          }
       },
-      recipesDirty(state, isDirty) {
-          state.isRecipesDirty = isDirty;
+      clean(state, entityType) {
+        const idx = state.dirtyValues.indexOf(entityType);
+        if (idx !== -1) {
+            state.dirtyValues.splice(idx, 1);
+        }
       },
-      recipeCategoriesDirty(state, isDirty) {
-          state.isRecipeCategoriesDirty = isDirty;
-      },
-      ingredientsDirty(state, isDirty) {
-          state.isIngredientsDirty = isDirty;
-      },
-      ingredientCategoriesDirty(state, isDirty) {
-          state.isIngredientCategoriesDirty = isDirty;
-      },
-      ingredientStoresDirty(state, isDirty) {
-          state.isIngredientStoreDirty = isDirty;
-      },
-      shoppingListDirty(state, isDirty) {
-          state.isShoppingListDirty = isDirty;
-      }
   },
   actions: {
       async loadInitialData({ commit, state }) {
@@ -276,61 +260,17 @@ export default store(function (/* { ssrContext } */) {
                 commit('authenticated', false);
             }
         } else {
-            if (state.isAuthenticated && state.isRecipeEventDirty) {
-                try {
-                    await window.recipeApi.writeJSON('events', JSON.stringify(state.events));
-                    commit('recipeEventsDirty', false);
-                } catch (e) {
-                    commit('authenticated', false);
-                }
-            }
-            if (state.isAuthenticated && state.isRecipesDirty) {
-                try {
-                    await window.recipeApi.writeJSON('recipes', JSON.stringify(state.recipes));
-                    commit('recipesDirty', false);
-                } catch (e) {
-                    commit('authenticated', false);
-                }
-            }
-            if (state.isAuthenticated && state.isRecipeCategoriesDirty) {
-                try {
-                    await window.recipeApi.writeJSON('recipe_categories', JSON.stringify(state.recipeCategories));
-                    commit('recipeCategoriesDirty', false);
-                } catch (e) {
-                    commit('authenticated', false);
-                }
-            }
-            if (state.isAuthenticated && state.isIngredientsDirty) {
-                try {
-                    await window.recipeApi.writeJSON('ingredients', JSON.stringify(state.ingredients));
-                    commit('ingredientsDirty', false);
-                } catch (e) {
-                    commit('authenticated', false);
-                }
-            }
-            if (state.isAuthenticated && state.isIngredientCategoriesDirty) {
-                try {
-                    await window.recipeApi.writeJSON('ingredient_categories', JSON.stringify(state.ingredientCategories));
-                    commit('ingredientCategoriesDirty', false);
-                } catch (e) {
-                    commit('authenticated', false);
-                }
-            }
-            if (state.isAuthenticated && state.isIngredientStoreDirty) {
-                try {
-                    await window.recipeApi.writeJSON('ingredient_stores', JSON.stringify(state.ingredientStores));
-                    commit('ingredientStoreDirty', false);
-                } catch (e) {
-                    commit('authenticated', false);
-                }
-            }
-            if (state.isAuthenticated && state.isShoppingListDirty) {
-                try {
-                    await window.recipeApi.writeJSON('shopping_lists', JSON.stringify(state.shoppingLists));
-                    commit('shoppingListDirty', false);
-                } catch (e) {
-                    commit('authenticated', false);
-                }
+            if (state.isAuthenticated) {
+                debugger;
+                state.dirtyValues.forEach(async (dirtyEntity) => {
+                    try {
+                        const dirtyCamelCase = dirtyEntity.replace(/_([a-z])/g, word => word.substring(1,2).toUpperCase());
+                        await window.recipeApi.writeJSON(dirtyEntity, JSON.stringify(state[dirtyCamelCase]));
+                        commit('clean', dirtyEntity);
+                    } catch (e) {
+                        commit('authenticated', false);
+                    }
+                });
             }
         }
       },
@@ -339,7 +279,7 @@ export default store(function (/* { ssrContext } */) {
           try {
             await window.recipeApi.writeJSON('events', JSON.stringify(state.events));
           } catch (e) {
-              commit('recipeEventsDirty', true);
+              commit('dirty', 'events');
               commit('authenticated', false);
           }
       },
@@ -348,7 +288,7 @@ export default store(function (/* { ssrContext } */) {
           try {
               await window.recipeApi.writeJSON('events', JSON.stringify(state.events));
           } catch (e) {
-              commit('recipeEventsDirty', true);
+              commit('dirty', 'events');
               commit('authenticated', false);
           }
       },
@@ -357,7 +297,7 @@ export default store(function (/* { ssrContext } */) {
           try {
               await window.recipeApi.writeJSON('recipes', JSON.stringify(state.recipes));
           } catch (e) {
-              commit('recipesDirty', true);
+              commit('dirty', 'recipes');
               commit('authenticated', false);
           }
       },
@@ -366,7 +306,7 @@ export default store(function (/* { ssrContext } */) {
           try { 
               await window.recipeApi.writeJSON('recipe_categories', JSON.stringify(state.recipeCategories));
           } catch (e) {
-              commit('recipeCategoriesDirty', true);
+              commit('dirty', 'recipe_categories');
               commit('authenticated', false);
           }
       },
@@ -375,7 +315,7 @@ export default store(function (/* { ssrContext } */) {
           try {
               await window.recipeApi.writeJSON('recipe_categories', JSON.stringify(state.recipeCategories));
           } catch (e) {
-              commit('recipeCategoriesDirty', true);
+              commit('dirty', 'recipe_categories');
               commit('authenticated', false);
           }
       },
@@ -384,7 +324,7 @@ export default store(function (/* { ssrContext } */) {
           try {
               await window.recipeApi.writeJSON('ingredients', JSON.stringify(state.ingredients));
           } catch (e) {
-              commit('ingredientsDirty', true);
+              commit('dirty', 'ingredients');
               commit('authenticated', false);
           }
       },
@@ -397,9 +337,9 @@ export default store(function (/* { ssrContext } */) {
               commit('updateRecipeEvents', ingredient);
               await window.recipeApi.writeJSON('events', JSON.stringify(state.events));
           } catch (e) {
-              commit('ingredientsDirty', true);
-              commit('recipesDirty', true);
-              commit('recipeEventsDirty', true);
+              commit('dirty', 'ingredients');
+              commit('dirty', 'recipes');
+              commit('dirty', 'events');
               commit('authenticated', false);
         }
       },
@@ -408,7 +348,7 @@ export default store(function (/* { ssrContext } */) {
           try {
               await window.recipeApi.writeJSON('ingredient_categories', JSON.stringify(state.ingredientCategories));
           } catch (e) {
-              commit('ingredientCategoriesDirty', true);
+              commit('dirty', 'ingredient_categories');
               commit('authenticated', false);
           }
       },
@@ -417,7 +357,7 @@ export default store(function (/* { ssrContext } */) {
           try {
               await window.recipeApi.writeJSON('ingredient_categories', JSON.stringify(state.ingredientCategories));
           } catch (e) {
-              commit('ingredientCategoriesDirty', true);
+              commit('dirty', 'ingredient_categories');
               commit('authenticated', false);
           }
       },
@@ -426,16 +366,16 @@ export default store(function (/* { ssrContext } */) {
           try {
               await window.recipeApi.writeJSON('ingredient_stores', JSON.stringify(state.ingredientStores));
           } catch (e) {
-              commit('ingredientStoressDirty', true);
+              commit('dirty', 'ingredient_stores');
               commit('authenticated', false);
           }
       },
       async updateIngredientStore({ commit, state }, ingredientStoreData) {
           commit('updateIngredientStore', ingredientStoreData);
           try {
-              await window.recipeApi.writeJSON('ingredient_store', JSON.stringify(state.ingredientStores));
+              await window.recipeApi.writeJSON('ingredient_stores', JSON.stringify(state.ingredientStores));
           } catch (e) {
-              commit('ingredientStoresDirty', false);
+              commit('dirty', 'ingredient_stores');
               commit('authenticated', false);
           }
       },
@@ -444,7 +384,7 @@ export default store(function (/* { ssrContext } */) {
           try {
               await window.recipeApi.writeJSON('ingredient_stores', JSON.stringify(state.ingredientStores));
           } catch (e) {
-              commit('ingredientStoressDirty', true);
+              commit('dirty', 'ingredient_stores');
               commit('authenticated', false);
           }
       },
@@ -453,7 +393,7 @@ export default store(function (/* { ssrContext } */) {
           try {
               await window.recipeApi.writeJSON('shopping_lists', JSON.stringify(state.shoppingLists));
           } catch (e) {
-              commit('shoppingListDirty', true);
+              commit('dirty', 'shopping_lists');
               commit('authenticated', false);
           }
       },
@@ -462,7 +402,7 @@ export default store(function (/* { ssrContext } */) {
           try {
               await window.recipeApi.writeJSON('shopping_lists', JSON.stringify(state.shoppingLists));
           } catch (e) {
-              commit('shoppingListDirty', true);
+              commit('dirty', 'shopping_lists');
               commit('authenticated', false);
           }
       },
@@ -471,7 +411,7 @@ export default store(function (/* { ssrContext } */) {
           try {
               await window.recipeApi.writeJSON('shopping_lists', JSON.stringify(state.shoppingLists));
           } catch (e) {
-              commit('shoppingListDirty', true);
+              commit('dirty', 'shopping_lists');
               commit('authenticated', false);
           }
       },
@@ -484,7 +424,6 @@ export default store(function (/* { ssrContext } */) {
     // enable strict mode (adds overhead!)
     // for dev mode and --debug builds only
     strict: process.env.DEBUGGING,
-  })
-
+  });
   return Store
-})
+});
