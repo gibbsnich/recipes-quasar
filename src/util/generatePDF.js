@@ -4,7 +4,7 @@ import jsPDF, { AcroFormCheckBox } from 'jspdf';
 
 const MAX_PAGE_Y = 290;
 
-export const generateIngredientData = ({start, end}, store) => {
+const generateIngredientData = ({start, end}, store) => {
     const currentEvents = store.state.events.filter((e) => e.start && e.start >= start && e.start <= end).map((e) => toRaw(e));
     //can contain multiple instances of the same recipe!
     const currentRecipes = currentEvents.filter((e) => !e.extendedProps.extra).map((e) => toRaw(store.state.recipes.filter((r) => r.id === e.extendedProps.recipeId)[0]));
@@ -31,42 +31,62 @@ export const generateIngredientData = ({start, end}, store) => {
     return { allIngredients, currentEvents, ingredientKeys: Object.keys(allIngredients).sort((a, b) => a < b ? -1 : (b < a ? 1 : 0)) };
 };
 
+const generateShoppingListInternal = ({ allIngredients, currentEvents, ingredientKeys }, store) => {
+    const stores = store.getters.getSortedIngredientStores;
+    const categories = store.getters.getSortedIngredientCategories;
+    const shoppingList = {};
+    shoppingList.stores = [];
+    stores.forEach((store, idx) => {
+        if (ingredientKeys.filter(ik => allIngredients[ik].store === store.id).length > 0) {
+            const storeShoppingList = [];
+            categories.forEach((category, idx) => {
+                const filteredKeys = ingredientKeys.filter(ik => allIngredients[ik].store === store.id && allIngredients[ik].category === category.id);
+                if (filteredKeys.length > 0) {
+                    filteredKeys.sort((a, b) => a < b ? -1 : (b < a ? 1 : 0)).forEach((i, idx) => {
+                        const text = allIngredients[i].amount && allIngredients[i].amount.length > 0 ? `${allIngredients[i].amount} ${i}` : i;
+                        storeShoppingList.push({label: text, buyed: false});
+                    });
+                }
+            });
+            shoppingList.stores.push({name: store.name, list: storeShoppingList});   
+        }
+    });
+    return shoppingList;
+};
+
+export const generateShoppingList = ({start, end}, store) => {
+    const startString = dateToString(start);
+    const endString = dateToString(end);
+    const shoppingList = generateShoppingListInternal(generateIngredientData({start: startString, end: endString}, store), store);
+    shoppingList.start = dateStringToReadableString(startString);
+    shoppingList.end = dateStringToReadableString(endString);
+    return shoppingList;
+};
+
 export const generatePDF = ({start, end}, store) => {
     const { allIngredients, currentEvents, ingredientKeys } = generateIngredientData({start: dateToString(start), end: dateToString(end)}, store);
+    const shoppingList = generateShoppingListInternal({ allIngredients, currentEvents, ingredientKeys }, store);
     const doc = new jsPDF();
     doc.setFontSize('16');
     doc.text('Einkaufsliste', 60, 10);
+    doc.setFontSize('14');
+    doc.text(`${dateStringToReadableString(dateToString(start))} – ${dateStringToReadableString(dateToString(end))}`, 110, 10);
     doc.setFontSize('12');
     let y = 20;
-    const stores = store.getters.getSortedIngredientStores;
-    const categories = store.getters.getSortedIngredientCategories;
-    stores.forEach((store, idx) => {
-        if (ingredientKeys.filter(ik => allIngredients[ik].store === store.id).length > 0) {
-            doc.setFontSize('14');
-            doc.text(store.name, 30, y);
-            doc.setFontSize('12');
+    
+    shoppingList.stores.forEach((shoppingListEntry) => {
+        doc.setFontSize('14');
+        doc.text(shoppingListEntry.name, 30, y);
+        doc.setFontSize('12');
+        y += 8;
+        shoppingListEntry.list.forEach((item) => {
+            const checkbox = new AcroFormCheckBox();
+            checkbox.appearanceState = 'Off';
+            checkbox.fieldName = item.label;
+            checkbox.Rect = [10, y-8, 10, 10];
+            doc.addField(checkbox);
+            doc.text(item.label, 20, y);
             y += 8;
-        }
-        categories.forEach((category, idx) => {
-            const filteredKeys = ingredientKeys.filter(ik => allIngredients[ik].store === store.id && allIngredients[ik].category === category.id);
-            if (filteredKeys.length > 0) {
-                //doc.text(category.name, 25, y);
-                //y += 8;
-                filteredKeys.sort((a, b) => a < b ? -1 : (b < a ? 1 : 0)).forEach((i, idx) => {
-                    if (y > MAX_PAGE_Y) {
-                        y = 10;
-                        doc.addPage();
-                    }
-                    const text = allIngredients[i].amount && allIngredients[i].amount.length > 0 ? `${allIngredients[i].amount} ${i}` : i;
-                    const checkbox = new AcroFormCheckBox();
-                    checkbox.appearanceState = 'Off';
-                    checkbox.fieldName = text;
-                    checkbox.Rect = [10, y-8, 10, 10];
-                    doc.addField(checkbox);
-                    doc.text(text, 20, y);
-                    y += 8;
-                });
-            }   
         });
     });
 
@@ -93,7 +113,11 @@ export const generatePDF = ({start, end}, store) => {
                     y = 10;
                     doc.addPage();
                 }
-                doc.text(i.amount + ' ' + i.ingredient, 15, y);
+                if (i.amount) {
+                    doc.text(i.amount + ' ' + i.ingredient, 15, y);
+                } else {
+                    doc.text(i.ingredient, 15, y);
+                }
                 y += 8;
             });
             y += 2;

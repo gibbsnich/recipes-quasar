@@ -9,7 +9,7 @@ use fs2::FileExt;
 use sanitize_html::sanitize_str;
 use sanitize_html::rules::predefined::DEFAULT;
 
-const FILENAMES: &'static [&'static str] = &["ingredients", "ingredient_categories", "ingredient_stores", "events", "recipes", "recipe_categories"];
+const FILENAMES: &'static [&'static str] = &["ingredients", "ingredient_categories", "ingredient_stores", "events", "recipes", "recipe_categories", "shopping_lists"];
 
 fn check_valid_file(file_name: &str) -> bool {
     return FILENAMES.contains(&file_name);

@@ -24,6 +24,7 @@ export default defineComponent({
               {href: 'recipes', name: 'Rezepte'},
               {href: 'ingredients', name: 'Zutaten'},
               {href: 'categories', name: 'Kategorien'},
+              {href: 'shoppinglists', name: 'Einkaufslisten'},
           ]
       }
   },

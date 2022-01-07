@@ -8,7 +8,7 @@
 
 <script>
 import { defineComponent } from 'vue';
-import '@fullcalendar/core/vdom'; // solves problem with Vite
+//import '@fullcalendar/core/vdom'; // solves problem with Vite
 import deLocale from '@fullcalendar/core/locales/de';
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -20,7 +20,25 @@ import { UnknownIngredientsMixin } from './UnknownIngredientsMixin.js';
 import IngredientWithoutCategoryModal from './IngredientWithoutCategoryModal.vue';
 import LoginModal from './web/LoginModal.vue';
 import { dateToString } from '../util/date.js';
-import { generatePDF } from '../util/generatePDF.js';
+import { generatePDF, generateShoppingList } from '../util/generatePDF.js';
+
+const getWidth = () =>
+   Math.max(
+    document.body.scrollWidth,
+    document.documentElement.scrollWidth,
+    document.body.offsetWidth,
+    document.documentElement.offsetWidth,
+    document.documentElement.clientWidth
+  );
+
+const getHeight = () =>
+  Math.max(
+    document.body.scrollHeight,
+    document.documentElement.scrollHeight,
+    document.body.offsetHeight,
+    document.documentElement.offsetHeight,
+    document.documentElement.clientHeight
+  );
 
 export default defineComponent({
     components: {
@@ -37,12 +55,20 @@ export default defineComponent({
             calendarOptions: {
                 plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
                 locale: deLocale,
-                //slotDuration: "02:00:00",
+                aspectRatio: this.calendarAspectRatio(),//Platform.is.mobile ? 0.85 : 2,
+                //slotDuration: "01:00:00",
+                slotMinTime: "10:00:00",
+                slotMaxTime: "20:00:00",
                 initialView: 'timeGridWeek',
                 headerToolbar: {
-                    left: 'prev,next today gotoRecipesButton generatePDFButton generateIngredientListButton',
+                    left: 'prev,next today',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek'
+                },
+                footerToolbar: {
+                    left: 'gotoRecipesButton,generatePDFButton',
+                    // right: 'generateShoppingListButton,existingShoppingListsButton'
+                    right: 'generateShoppingListButton'
                 },
                 customButtons: {
                     gotoRecipesButton: {
@@ -59,11 +85,13 @@ export default defineComponent({
                             }
                         }
                     },
-                    generateIngredientListButton: {
+                    generateShoppingListButton: {
                         text: 'Einkaufsliste erzeugen',
                         click: () => {
                             if (this.currentSelection) {
-                                this.$router.push(`/ingredient-list/${dateToString(this.currentSelection.start)}/${dateToString(this.currentSelection.end)}`);
+                                const newShoppingList = generateShoppingList({start: this.currentSelection.start, end: this.currentSelection.end}, this.$store);
+                                this.$store.dispatch('storeShoppingList', newShoppingList);
+                                this.$router.push(`/shopping-list/${newShoppingList.id}`);
                             }
                         }
                     },
@@ -85,6 +113,11 @@ export default defineComponent({
         }
     },
     methods: {
+        calendarAspectRatio() {
+            let r = (getWidth() / getHeight()) * 1.2;
+            if (r < .7) r = 1.4;
+            return r;
+        },
         handleSelect(info) {
             this.currentSelection = {start: info.start, end: info.end};
         },
@@ -142,5 +175,20 @@ export default defineComponent({
     }
     a:hover {
         color: #000;
+    }
+    @media(max-width: 767px) {
+        .fc-toolbar.fc-footer-toolbar {
+            display: flex;
+            flex-direction: column;
+        }
+        .fc-toolbar.fc-footer-toolbar .fc-left {
+            order: 1;
+        }
+        .fc-toolbar.fc-footer-toolbar .fc-center {
+            order: 1;
+        }
+        .fc-toolbar.fc-footer-toolbar .fc-right {
+            order: 1;
+        }
     }
 </style>

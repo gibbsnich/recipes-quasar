@@ -42,6 +42,7 @@ export default store(function (/* { ssrContext } */) {
           ingredientCategories: [],
           ingredientStores: [],
           ingredients: [],
+          shoppingLists: [],
           isInitialized: false,
           isAuthenticated: true,
           isRecipeEventDirty: false,
@@ -50,9 +51,14 @@ export default store(function (/* { ssrContext } */) {
           isIngredientsDirty: false,
           isIngredientCategoriesDirty: false,
           isIngredientStoreDirty: false,
+          isShoppingListDirty: false,
       }
   },
   getters: {
+      isAuthenticated (state) {
+          debugger;
+          return state.isAuthenticated;
+      },
       getIngredientById: (state) => (ingredientId) => {
           return state.ingredients.find(i => i.id === ingredientId);
       },
@@ -104,6 +110,12 @@ export default store(function (/* { ssrContext } */) {
       },
       getRecipeCategoryByName: (state) => (recipeCategoryName) => {
           return state.recipeCategories.find(recipeCategory => recipeCategory.name === recipeCategoryName);
+      },
+      getShoppingLists (state) {
+          return state.shoppingLists.sort((a, b) => a.id < b.id ? -1 : (b.id < a.id ? 1 : 0));
+      },
+      getShoppingList: (state) => (shoppingListId) => {
+          return state.shoppingLists.find(shoppingList => shoppingList.id === shoppingListId);
       }
   },
   mutations: {
@@ -116,6 +128,7 @@ export default store(function (/* { ssrContext } */) {
           state.ingredients = data.ingredients || [];
           state.ingredientCategories = data.ingredientCategories || [];
           state.ingredientStores = data.ingredientStores || [];
+          state.shoppingLists = data.shoppingLists || [];
       },
       storeRecipe(state, recipe) {
           if (!recipe.id) {
@@ -205,6 +218,18 @@ export default store(function (/* { ssrContext } */) {
               }
           });
       },
+      storeShoppingList(state, shoppingList) {
+          const newShoppingListId = nextId(state.shoppingLists);
+          shoppingList.id = newShoppingListId;
+          state.shoppingLists.push(shoppingList);
+      },
+      deleteShoppingList(state, shoppingListId) {
+        const listIndex = state.shoppingLists.findIndex(l => l.id === shoppingListId.id);
+        state.shoppingLists.splice(listIndex, 1);
+      },
+      toggleShoppingListItem(state, { listId, storeIndex, itemIndex, checked }) {
+          state.shoppingLists.find(l => l.id === listId).stores[storeIndex].list[itemIndex].buyed = checked;
+      },
       authenticated(state, isAuth) {
           state.isAuthenticated = isAuth;
       },
@@ -229,6 +254,9 @@ export default store(function (/* { ssrContext } */) {
       ingredientStoresDirty(state, isDirty) {
           state.isIngredientStoreDirty = isDirty;
       },
+      shoppingListDirty(state, isDirty) {
+          state.isShoppingListDirty = isDirty;
+      }
   },
   actions: {
       async loadInitialData({ commit, state }) {
@@ -241,6 +269,7 @@ export default store(function (/* { ssrContext } */) {
                     ingredients: await window.recipeApi.readJSON('ingredients'),
                     ingredientCategories: await window.recipeApi.readJSON('ingredient_categories'),
                     ingredientStores: await window.recipeApi.readJSON('ingredient_stores'),
+                    shoppingLists: await window.recipeApi.readJSON('shopping_lists'),
                 });
                 commit('authenticated', true);
                 commit('initialized', true);
@@ -292,6 +321,14 @@ export default store(function (/* { ssrContext } */) {
                 try {
                     await window.recipeApi.writeJSON('ingredient_stores', JSON.stringify(state.ingredientStores));
                     commit('ingredientStoreDirty', false);
+                } catch (e) {
+                    commit('authenticated', false);
+                }
+            }
+            if (state.isAuthenticated && state.isShoppingListDirty) {
+                try {
+                    await window.recipeApi.writeJSON('shopping_lists', JSON.stringify(state.shoppingLists));
+                    commit('shoppingListDirty', false);
                 } catch (e) {
                     commit('authenticated', false);
                 }
@@ -409,6 +446,33 @@ export default store(function (/* { ssrContext } */) {
               await window.recipeApi.writeJSON('ingredient_stores', JSON.stringify(state.ingredientStores));
           } catch (e) {
               commit('ingredientStoressDirty', true);
+              commit('authenticated', false);
+          }
+      },
+      async storeShoppingList({ commit, state }, shoppingList) {
+          commit('storeShoppingList', shoppingList);
+          try {
+              await window.recipeApi.writeJSON('shopping_lists', JSON.stringify(state.shoppingLists));
+          } catch (e) {
+              commit('shoppingListDirty', true);
+              commit('authenticated', false);
+          }
+      },
+      async deleteShoppingList({ commit, state }, shoppingListId) {
+          commit('deleteShoppingList', shoppingListId);
+          try {
+              await window.recipeApi.writeJSON('shopping_lists', JSON.stringify(state.shoppingLists));
+          } catch (e) {
+              commit('shoppingListDirty', true);
+              commit('authenticated', false);
+          }
+      },
+      async toggleShoppingListItem({ commit, state }, { listId, storeIndex, itemIndex, checked }) {
+          commit('toggleShoppingListItem', { listId, storeIndex, itemIndex, checked });
+          try {
+              await window.recipeApi.writeJSON('shopping_lists', JSON.stringify(state.shoppingLists));
+          } catch (e) {
+              commit('shoppingListDirty', true);
               commit('authenticated', false);
           }
       },
