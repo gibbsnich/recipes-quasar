@@ -23,7 +23,7 @@ export default defineComponent({
   },
   methods: {
       getSortedIngredients() {
-        return this.$store.getters.getSortedIngredients
+        return this.$store.getters.getSortedIngredients;
       },
   },
 });

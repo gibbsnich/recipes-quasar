@@ -44,7 +44,7 @@ const generateShoppingListInternal = ({ allIngredients, currentEvents, ingredien
                 if (filteredKeys.length > 0) {
                     filteredKeys.sort((a, b) => a < b ? -1 : (b < a ? 1 : 0)).forEach((i, idx) => {
                         const text = allIngredients[i].amount && allIngredients[i].amount.length > 0 ? `${allIngredients[i].amount} ${i}` : i;
-                        storeShoppingList.push({label: text, buyed: false});
+                        storeShoppingList.push({label: text, bought: false});
                     });
                 }
             });

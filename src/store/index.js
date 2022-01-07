@@ -227,7 +227,7 @@ export default store(function (/* { ssrContext } */) {
         state.shoppingLists.splice(listIndex, 1);
       },
       toggleShoppingListItem(state, { listId, storeIndex, itemIndex, checked }) {
-          state.shoppingLists.find(l => l.id === listId).stores[storeIndex].list[itemIndex].buyed = checked;
+          state.shoppingLists.find(l => l.id === listId).stores[storeIndex].list[itemIndex].bought = checked;
       },
       authenticated(state, isAuth) {
           state.isAuthenticated = isAuth;

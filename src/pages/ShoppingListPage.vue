@@ -11,8 +11,8 @@
                     <ul class="list-group">
                         <li class="list-group-item"  v-for="(item, itemIndex) in store.list" :key="itemIndex">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" :id="item.label" :checked="item.buyed" @change="this.saveState($event, this.shoppingList.id, storeIndex, itemIndex)">
-                                <label class="form-check-label" :for="item.label" :class="{strike: item.buyed}">{{ item.label }}</label>
+                                <input class="form-check-input" type="checkbox" :id="item.label" :checked="item.bought" @change="this.saveState($event, this.shoppingList.id, storeIndex, itemIndex)">
+                                <label class="form-check-label" :for="item.label" :class="{strike: item.bought}">{{ item.label }}</label>
                             </div>
                         </li>
                     </ul>
