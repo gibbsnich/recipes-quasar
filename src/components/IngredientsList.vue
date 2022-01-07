@@ -69,7 +69,7 @@ export default defineComponent({
             const possibleIngredientsRaw = this.$store.getters.getIngredientsBySubstring(value);
             const possibleIngredients = possibleIngredientsRaw.map(i => { 
                 const idx = i.ingredient.toLowerCase().indexOf(value.toLowerCase());
-                i.highlight = `${i.ingredient.substring(0, idx)}<b>${i.ingredient.substring(idx, value.length)}</b>${i.ingredient.substring(idx+value.length, i.ingredient.length)}`;
+                i.highlight = `${i.ingredient.substring(0, idx)}<b>${i.ingredient.substring(idx, idx + value.length)}</b>${i.ingredient.substring(idx + value.length)}`;
                 return i;
             });
             if (ingredientIndex === -1) {
