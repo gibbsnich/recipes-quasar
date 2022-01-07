@@ -55,4 +55,8 @@ export default defineComponent({
   h6 {
     margin-left: 1rem;
   }
+  a {
+      margin-left: 1rem;
+      color: #0d6efd;
+  }
 </style>
