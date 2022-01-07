@@ -56,7 +56,6 @@ export default store(function (/* { ssrContext } */) {
   },
   getters: {
       isAuthenticated (state) {
-          debugger;
           return state.isAuthenticated;
       },
       getIngredientById: (state) => (ingredientId) => {
