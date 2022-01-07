@@ -3,7 +3,9 @@
     <select-recipe-modal :key="selectRecipeKey" v-show="isSelectRecipeModalVisible" @close="closeSelectRecipeModal" v-bind:event="selectRecipeModalEventInfo" />
     <random-ingredients-modal :key="randomIngredientKey" v-show="isRandomIngredientsModalVisible" @close="closeRandomIngredientsModal" v-bind:date="randomIngredientsDate" />
     <ingredient-without-category-modal v-show="isIngredientWithoutCategoryModalVisible" @close="closeIngredientsWithoutCategoryModal" v-bind:ingredient="ingredientWithoutCategory" />
-    <FullCalendar :options="{...calendarOptions, events: this.$store.state.events}"  />
+    <div :class="{blur_bg: !this.$store.state.isAuthenticated || isSelectRecipeModalVisible || isRandomIngredientsModalVisible || isIngredientWithoutCategoryModalVisible}">
+        <FullCalendar :options="{...calendarOptions, events: this.$store.state.events}" />
+    </div>
 </template>
 
 <script>

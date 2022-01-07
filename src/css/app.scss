@@ -1,1 +1,6 @@
 // app global css in SCSS form
+.blur_bg {
+    filter: blur(2px);
+    background-color: rgba(0, 0, 0, 0.3);
+    height: 100vh;
+}
