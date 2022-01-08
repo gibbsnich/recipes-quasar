@@ -9,8 +9,10 @@
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
     "dev:electron": "quasar dev -m electron",
+    "dev:pwa": "quasar dev -m pwa",
     "build": "quasar build",
-    "build:electron": "quasar build -m electron"
+    "build:electron": "quasar build -m electron",
+    "build:pwa": "quasar build -m pwa"
   },
   "repository": "https://github.com/gibbsnich/recipes-quasar",
   "author": {
@@ -46,7 +48,8 @@
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-vue": "^7.0.0",
-    "eslint-webpack-plugin": "^2.4.0"
+    "eslint-webpack-plugin": "^2.4.0",
+    "workbox-webpack-plugin": "^6.0.0"
   },
   "browserslist": [
     "last 10 Chrome versions",
