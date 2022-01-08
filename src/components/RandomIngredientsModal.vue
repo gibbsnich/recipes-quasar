@@ -50,15 +50,19 @@ export default defineComponent({
     data() {
         return {
             ingredients: [],
+            existingEvent: false,
         }
     },
-    mounted() {
-        if (this.date) {
-            const ingredientsEvent = this.$store.getters.getIngredientEventByStart(this.date + "T14:00");
-            if (ingredientsEvent) {
-                this.ingredients = JSON.parse(JSON.stringify(ingredientsEvent.extendedProps.ingredients));
+    watch: {
+        date(date) {
+            if (this.date) {
+                const ingredientsEvent = this.$store.getters.getIngredientEventByStart(date + "T14:00");
+                if (ingredientsEvent) {
+                    this.existingEvent = true;
+                    this.ingredients = JSON.parse(JSON.stringify(ingredientsEvent.extendedProps.ingredients));
+                }
             }
-        }
+        },
     },
     methods: {
         getIngredients(ingredientCategoryId) {
@@ -66,7 +70,7 @@ export default defineComponent({
         },
         close() {
             const nonEmptyIngredients = this.ingredients.filter((i) => i.amount !== '' || i.ingredient !== '');
-            if (nonEmptyIngredients.length > 0) {
+            if (nonEmptyIngredients.length > 0 || this.existingEvent) {
                 this.$emit('close', {
                     title: 'Zutaten',
                     color: 'black',

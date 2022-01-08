@@ -16,6 +16,25 @@ import { nextId } from '../util/entity.js'
  * with the Store instance.
  */
 
+const toCamelCase = (entity) => 
+    entity.replace(/_([a-z])/g, word => word.substring(1,2).toUpperCase());
+
+const saveAndCheckNetwork = async (entities, commit, state) => {
+    if (!navigator.onLine) {
+        commit('online', false);
+        entities.forEach(e => commit('dirty', e));
+        commit('authenticated', false);
+    } else {
+        commit('online', true);
+        try {
+            entities.forEach(async e => await window.recipeApi.writeJSON(e, JSON.stringify(state[toCamelCase(e)])));
+        } catch (e) {
+            entities.forEach(e => commit('dirty', e));   
+            commit('authenticated', false);
+        }
+    }
+}
+
 export default store(function (/* { ssrContext } */) {
   const Store = createStore({
     state () {
@@ -45,6 +64,7 @@ export default store(function (/* { ssrContext } */) {
           shoppingLists: [],
           isInitialized: false,
           isAuthenticated: true,
+          isOnline: true,
           dirtyValues: [],
       }
   },
@@ -229,6 +249,9 @@ export default store(function (/* { ssrContext } */) {
       initialized(state, isInit) {
           state.isInitialized = isInit;
       },
+      online(state, isOnline) {
+          state.isOnline = isOnline;
+      },
       dirty(state, entityType) {
           if (state.dirtyValues.indexOf(entityType) === -1) {
             state.dirtyValues.push(entityType);
@@ -254,6 +277,7 @@ export default store(function (/* { ssrContext } */) {
                     ingredientStores: await window.recipeApi.readJSON('ingredient_stores'),
                     shoppingLists: await window.recipeApi.readJSON('shopping_lists'),
                 });
+                commit('online', navigator.onLine);
                 commit('authenticated', true);
                 commit('initialized', true);
             } catch(e) {
@@ -261,10 +285,9 @@ export default store(function (/* { ssrContext } */) {
             }
         } else {
             if (state.isAuthenticated) {
-                debugger;
                 state.dirtyValues.forEach(async (dirtyEntity) => {
                     try {
-                        const dirtyCamelCase = dirtyEntity.replace(/_([a-z])/g, word => word.substring(1,2).toUpperCase());
+                        const dirtyCamelCase = toCamelCase(dirtyEntity);
                         await window.recipeApi.writeJSON(dirtyEntity, JSON.stringify(state[dirtyCamelCase]));
                         commit('clean', dirtyEntity);
                     } catch (e) {
@@ -276,144 +299,69 @@ export default store(function (/* { ssrContext } */) {
       },
       async storeRecipeEvent({ commit, state }, event) {
           commit('storeRecipeEvent', event);
-          try {
-            await window.recipeApi.writeJSON('events', JSON.stringify(state.events));
-          } catch (e) {
-              commit('dirty', 'events');
-              commit('authenticated', false);
-          }
+          saveAndCheckNetwork(['events'], commit, state);
       },
       async storeEvent({ commit, state }, event) {
           commit('storeEvent', event);
-          try {
-              await window.recipeApi.writeJSON('events', JSON.stringify(state.events));
-          } catch (e) {
-              commit('dirty', 'events');
-              commit('authenticated', false);
-          }
+          saveAndCheckNetwork(['events'], commit, state);
       },
       async storeRecipe({ commit, state }, recipe) {
           commit('storeRecipe', recipe);
-          try {
-              await window.recipeApi.writeJSON('recipes', JSON.stringify(state.recipes));
-          } catch (e) {
-              commit('dirty', 'recipes');
-              commit('authenticated', false);
-          }
+          saveAndCheckNetwork(['recipes'], commit, state);
+      },
+      async changeRecipeOrder({ commit, state }, { changeId, beforeId }) {
+          commit('changeRecipeOrder', { changeId, beforeId });
+          saveAndCheckNetwork(['recipes'], commit, state);
       },
       async storeRecipeCategory({ commit, state }, recipeCategoryName) {
           commit('storeRecipeCategory', recipeCategoryName);
-          try { 
-              await window.recipeApi.writeJSON('recipe_categories', JSON.stringify(state.recipeCategories));
-          } catch (e) {
-              commit('dirty', 'recipe_categories');
-              commit('authenticated', false);
-          }
+          saveAndCheckNetwork(['recipe_categories'], commit, state);
       },
       async updateRecipeCategory({ commit, state}, recipeCategoryData) {
           commit('updateRecipeCategory', recipeCategoryData);
-          try {
-              await window.recipeApi.writeJSON('recipe_categories', JSON.stringify(state.recipeCategories));
-          } catch (e) {
-              commit('dirty', 'recipe_categories');
-              commit('authenticated', false);
-          }
+          saveAndCheckNetwork(['recipe_categories'], commit, state);
       },
       async storeIngredient({ commit, state }, { ingredientWithoutCategory, ingredientCategoryId, ingredientStoreId }) {
           commit('storeIngredient', { ingredientWithoutCategory, ingredientCategoryId, ingredientStoreId });
-          try {
-              await window.recipeApi.writeJSON('ingredients', JSON.stringify(state.ingredients));
-          } catch (e) {
-              commit('dirty', 'ingredients');
-              commit('authenticated', false);
-          }
+          saveAndCheckNetwork(['ingredients'], commit, state);
       },
       async updateIngredient({ commit, state }, ingredient) {
-          try {
-              commit('updateIngredient', ingredient);
-              await window.recipeApi.writeJSON('ingredients', JSON.stringify(state.ingredients));
-              commit('updateRecipes', ingredient);
-              await window.recipeApi.writeJSON('recipes', JSON.stringify(state.recipes));
-              commit('updateRecipeEvents', ingredient);
-              await window.recipeApi.writeJSON('events', JSON.stringify(state.events));
-          } catch (e) {
-              commit('dirty', 'ingredients');
-              commit('dirty', 'recipes');
-              commit('dirty', 'events');
-              commit('authenticated', false);
-        }
+        commit('updateIngredient', ingredient);
+        commit('updateRecipes', ingredient);
+        commit('updateRecipeEvents', ingredient);
+        saveAndCheckNetwork(['ingredients', 'recipes', 'events'], commit, state);
       },
       async storeIngredientCategory({ commit, state }, ingredientCategoryName) {
           commit('storeIngredientCategory', ingredientCategoryName);
-          try {
-              await window.recipeApi.writeJSON('ingredient_categories', JSON.stringify(state.ingredientCategories));
-          } catch (e) {
-              commit('dirty', 'ingredient_categories');
-              commit('authenticated', false);
-          }
+          saveAndCheckNetwork(['ingredient_categories'], commit, state);
       },
       async updateIngredientCategory({ commit, state}, ingredientCategoryData) {
           commit('updateIngredientCategory', ingredientCategoryData);
-          try {
-              await window.recipeApi.writeJSON('ingredient_categories', JSON.stringify(state.ingredientCategories));
-          } catch (e) {
-              commit('dirty', 'ingredient_categories');
-              commit('authenticated', false);
-          }
+          saveAndCheckNetwork(['ingredient_categories'], commit, state);
       },
       async storeIngredientStore({ commit, state }, ingredientStoreName) {
           commit('storeIngredientStore', ingredientStoreName);
-          try {
-              await window.recipeApi.writeJSON('ingredient_stores', JSON.stringify(state.ingredientStores));
-          } catch (e) {
-              commit('dirty', 'ingredient_stores');
-              commit('authenticated', false);
-          }
+          saveAndCheckNetwork(['ingredient_stores'], commit, state);
       },
       async updateIngredientStore({ commit, state }, ingredientStoreData) {
           commit('updateIngredientStore', ingredientStoreData);
-          try {
-              await window.recipeApi.writeJSON('ingredient_stores', JSON.stringify(state.ingredientStores));
-          } catch (e) {
-              commit('dirty', 'ingredient_stores');
-              commit('authenticated', false);
-          }
+          saveAndCheckNetwork(['ingredient_stores'], commit, state);
       },
       async updateRecipeCategory({ commit, state}, ingredientStoreData) {
           commit('updateRecipeCategory', ingredientStoreData);
-          try {
-              await window.recipeApi.writeJSON('ingredient_stores', JSON.stringify(state.ingredientStores));
-          } catch (e) {
-              commit('dirty', 'ingredient_stores');
-              commit('authenticated', false);
-          }
+          saveAndCheckNetwork(['ingredient_stores'], commit, state);
       },
       async storeShoppingList({ commit, state }, shoppingList) {
           commit('storeShoppingList', shoppingList);
-          try {
-              await window.recipeApi.writeJSON('shopping_lists', JSON.stringify(state.shoppingLists));
-          } catch (e) {
-              commit('dirty', 'shopping_lists');
-              commit('authenticated', false);
-          }
+          saveAndCheckNetwork(['shopping_lists'], commit, state);
       },
       async deleteShoppingList({ commit, state }, shoppingListId) {
           commit('deleteShoppingList', shoppingListId);
-          try {
-              await window.recipeApi.writeJSON('shopping_lists', JSON.stringify(state.shoppingLists));
-          } catch (e) {
-              commit('dirty', 'shopping_lists');
-              commit('authenticated', false);
-          }
+          saveAndCheckNetwork(['shopping_lists'], commit, state);
       },
       async toggleShoppingListItem({ commit, state }, { listId, storeIndex, itemIndex, checked }) {
           commit('toggleShoppingListItem', { listId, storeIndex, itemIndex, checked });
-          try {
-              await window.recipeApi.writeJSON('shopping_lists', JSON.stringify(state.shoppingLists));
-          } catch (e) {
-              commit('dirty', 'shopping_lists');
-              commit('authenticated', false);
-          }
+          saveAndCheckNetwork(['shopping_lists'], commit, state);
       },
     },
     /*

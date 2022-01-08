@@ -1,6 +1,6 @@
 <template>
-    <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated" />
-    <div :class="{blur_bg: !this.$store.state.isAuthenticated}">
+    <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated && this.$store.state.isOnline" />
+    <div :class="{blur_bg: (!this.$store.state.isAuthenticated && this.$store.state.isOnline)}">
         <calendar-link />
         <h4>Einkaufsliste</h4>
         <div v-if="this.shoppingList">

@@ -1,5 +1,5 @@
 <template>
-    <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated" />
+    <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated && this.$store.state.isOnline" />
     <ingredient-without-category-modal v-show="isIngredientWithoutCategoryModalVisible" @close="closeIngredientsWithoutCategoryModal" v-bind:ingredient="ingredientWithoutCategory" />
     <div :class="{blur_bg: !this.$store.state.isAuthenticated || isIngredientWithoutCategoryModalVisible}">
         <settings-menu activeTab="recipes" />
@@ -119,7 +119,7 @@ export default defineComponent({
 
 <style scoped src='@fullcalendar/common/main.css'></style>
 <style scoped>
-#action-group {
-    margin-top: 1rem;
-}
+    #action-group {
+        margin-top: 1rem;
+    }
 </style>
