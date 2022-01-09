@@ -1,6 +1,6 @@
 <template>
-    <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated && this.$store.state.isOnline" />
-    <div :class="{blur_bg: (!this.$store.state.isAuthenticated && this.$store.state.isOnline)}">
+    <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth" />
+    <div :class="{blur_bg: !this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth}">
         <settings-menu activeTab="shoppinglists" />
         <div class="container">
             <h4>Einkaufslisten</h4>

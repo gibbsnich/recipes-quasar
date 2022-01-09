@@ -1,7 +1,7 @@
 <template>
-    <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated && this.$store.state.isOnline" />
+    <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth" />
     <ingredient-without-category-modal v-show="isIngredientWithoutCategoryModalVisible" @close="closeIngredientsWithoutCategoryModal" v-bind:ingredient="ingredientWithoutCategory" />
-    <div :class="{blur_bg: (!this.$store.state.isAuthenticated && this.$store.state.isOnline) || isIngredientWithoutCategoryModalVisible}">
+    <div :class="{blur_bg: (!this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth) || isIngredientWithoutCategoryModalVisible}">
         <settings-menu activeTab="recipes" />
         <div class="container">
             <div class="row">
@@ -12,15 +12,15 @@
                         <template v-slot:default="slotProps">
                             <div class="list-group">
                                 <button type="button" v-for="recipe in this.$store.getters.getSortedRecipes(slotProps.category.id)" v-bind:key="recipe.id" 
-                                        :class="['list-group-item', 'list-group-item-action', {active: recipeId === recipe.id}]"
-                                        @click="selectRecipe(recipe.id)">{{ recipe.name }}</button>
+                                    :class="['list-group-item', 'list-group-item-action', {active: recipeId === recipe.id}]"
+                                    @click="selectRecipe(recipe.id)">{{ recipe.name }}</button>
                             </div>
                         </template>
                         <template v-slot:rest="restProps">
                             <div class="list-group">
                                 <button type="button" v-for="recipe in restProps.items" v-bind:key="recipe.id"
-                                        :class="['list-group-item', 'list-group-item-action', {active: recipeId === recipe.id}]"
-                                        @click="selectRecipe(recipe.id)">{{ recipe.name }}</button>
+                                    :class="['list-group-item', 'list-group-item-action', {active: recipeId === recipe.id}]"
+                                    @click="selectRecipe(recipe.id)">{{ recipe.name }}</button>
                             </div>
                         </template>
                     </accordion>

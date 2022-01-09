@@ -23,7 +23,11 @@ export default boot(({ app }) => {
                 checkResponse(response);
             },
             readJSON: async (fileName) => {
-                if (!navigator.onLine) {
+                let isDirty = false;
+                if (localStorage.getItem('dirty')) {
+                    isDirty = JSON.parse(localStorage.getItem('dirty')).indexOf(fileName) !== -1;
+                }
+                if (!navigator.onLine || isDirty) {
                     const localValue = localStorage.getItem(fileName);
                     if (!localValue) {
                         throw 'Unauthorized';

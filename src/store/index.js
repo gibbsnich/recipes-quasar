@@ -23,13 +23,15 @@ const saveAndCheckNetwork = async (entities, commit, state) => {
     if (!navigator.onLine) {
         commit('online', false);
         entities.forEach(e => commit('dirty', e));
+        localStorage.setItem('dirty', JSON.stringify(state.dirtyValues));
         commit('authenticated', false);
     } else {
         commit('online', true);
         try {
             entities.forEach(async e => await window.recipeApi.writeJSON(e, JSON.stringify(state[toCamelCase(e)])));
         } catch (e) {
-            entities.forEach(e => commit('dirty', e));   
+            entities.forEach(e => commit('dirty', e));
+            localStorage.setItem('dirty', JSON.stringify(state.dirtyValues));
             commit('authenticated', false);
         }
     }
@@ -66,6 +68,7 @@ export default store(function (/* { ssrContext } */) {
           isAuthenticated: true,
           isOnline: true,
           dirtyValues: [],
+          forceNoAuth: false,
       }
   },
   getters: {
@@ -251,6 +254,9 @@ export default store(function (/* { ssrContext } */) {
       },
       online(state, isOnline) {
           state.isOnline = isOnline;
+      },
+      forceNoAuth(state, forceNoAuthFlag) {
+          state.forceNoAuth = forceNoAuthFlag;
       },
       dirty(state, entityType) {
           if (state.dirtyValues.indexOf(entityType) === -1) {

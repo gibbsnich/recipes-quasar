@@ -4,6 +4,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Anmeldung</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="close"></button>
                 </div>
                 <div class="modal-body">
                     <ul class="nav nav-tabs">
@@ -170,6 +171,9 @@ export default defineComponent({
                 this.$store.commit('authenticated', true);
                 this.$store.dispatch('loadInitialData');
             }
+        },
+        close() {
+            this.$store.commit('forceNoAuth', true);
         },
     },
 });
