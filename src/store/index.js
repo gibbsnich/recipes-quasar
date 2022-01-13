@@ -213,11 +213,17 @@ export default store(function (/* { ssrContext } */) {
           if (!recipe)
               return;
           const { eventStart, eventEnd } = event.extendedProps.recur ? 
-              recurEventToEvent(event) : [null, null];
+              recurEventToEvent(event) : {eventStart: event.eventStart, eventEnd: null};
+          
           const startISO = eventStart ? eventStart : dateToTimeString(event.start);
           const selEvent = state.events.find((evt) => evt.start === startISO);
           if (!selEvent) {
-              state.events.push({title: recipe.name, start: eventStart, end: eventEnd, color: 'red', extendedProps: {recipeId: recipe.id}});
+              event.title = recipe.name;
+              event.start = eventStart;
+              event.extendedProps.recipeId = recipe.id;
+              event.extendedProps.recur = false;
+              state.events.push(event);
+              //state.events.push({title: recipe.name, start: eventStart, end: eventEnd, color: 'red', extendedProps: {recipeId: recipe.id}});
           } else {
               selEvent.title = recipe.name;
               selEvent.extendedProps.recipeId = recipe.id;
@@ -377,7 +383,7 @@ export default store(function (/* { ssrContext } */) {
     */
     // enable strict mode (adds overhead!)
     // for dev mode and --debug builds only
-    strict: process.env.DEBUGGING,
+    strict: false,// process.env.DEBUGGING,
   });
   return Store
 });
