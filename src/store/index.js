@@ -203,7 +203,12 @@ export default store(function (/* { ssrContext } */) {
       storeEvent(state, event) {
           const ingredientsEvent = state.events.find(e => e.extendedProps.extra && e.start === event.start);
           if (ingredientsEvent) {
-              ingredientsEvent.extendedProps.ingredients = event.extendedProps.ingredients;
+              if (event.extendedProps.ingredients.length > 0) {
+                ingredientsEvent.extendedProps.ingredients = event.extendedProps.ingredients;
+              } else {
+                  const idx = state.events.findIndex(e => e.extendedProps.extra && e.start === event.start);
+                  state.events.splice(idx, 1);
+              }
           } else {
               state.events.push(event);
           }
@@ -377,7 +382,7 @@ export default store(function (/* { ssrContext } */) {
     */
     // enable strict mode (adds overhead!)
     // for dev mode and --debug builds only
-    strict: process.env.DEBUGGING,
+    strict: false,//process.env.DEBUGGING,
   });
   return Store
 });
