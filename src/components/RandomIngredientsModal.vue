@@ -91,7 +91,7 @@ export default defineComponent({
         addIngredientById(ingredientId) {
             const selIngredient = this.$store.getters.getIngredientById(ingredientId);
             if (selIngredient) {
-                this.ingredients.push({amount: '', ingredient: selIngredient.ingredient, id: selIngredient.id, categoryId: selIngredient.categoryId});
+                this.ingredients.push({amount: '', ingredient: selIngredient.ingredient, id: selIngredient.id, categoryId: selIngredient.categoryId, storeId: selIngredient.storeId});
             }
         },
     }
