@@ -43,6 +43,7 @@ const getHeight = () =>
   );
 
 export default defineComponent({
+    name: 'Calendar',
     components: {
         FullCalendar,
         SelectRecipeModal,
@@ -59,6 +60,7 @@ export default defineComponent({
                 locale: deLocale,
                 aspectRatio: this.calendarAspectRatio(),//Platform.is.mobile ? 0.85 : 2,
                 //slotDuration: "01:00:00",
+                weekNumbers: true,
                 slotMinTime: "10:00:00",
                 slotMaxTime: "20:00:00",
                 initialView: 'timeGridWeek',
@@ -116,8 +118,9 @@ export default defineComponent({
     },
     methods: {
         calendarAspectRatio() {
+            
             let r = (getWidth() / getHeight()) * 1.2;
-            if (r < .7) r = 1.4;
+            if (r < .7) r=.7;//r = 1.4;
             return r;
         },
         handleSelect(info) {
