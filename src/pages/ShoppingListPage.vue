@@ -1,39 +1,43 @@
 <template>
     <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth" />
     <div :class="{blur_bg: !this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth}">
-        <calendar-link />
-        <h4>Einkaufsliste</h4>
-        <div v-if="this.shoppingList">
-            <h6>{{ this.shoppingList.start }} &ndash; {{ this.shoppingList.end }}</h6>
-            <div v-for="(store, storeIndex) in this.shoppingList.stores" :key="store">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-subtitle mb-2 text-muted">{{ store.name }}</h5>
-                        <ul class="list-group">
-                            <li class="list-group-item"  v-for="(item, itemIndex) in store.list" :key="itemIndex">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" :id="item.label" :checked="item.bought" @change="this.saveState($event, this.shoppingList.id, storeIndex, itemIndex)">
-                                    <label class="form-check-label" :for="item.label" :class="{strike: item.bought}">{{ item.label }}</label>
-                                </div>
-                            </li>
-                        </ul>
+        <!--<calendar-link />-->
+        <settings-menu>
+            <h4>Einkaufsliste</h4>
+            <div v-if="this.shoppingList">
+                <h6>{{ this.shoppingList.start }} &ndash; {{ this.shoppingList.end }}</h6>
+                <div v-for="(store, storeIndex) in this.shoppingList.stores" :key="store">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-subtitle mb-2 text-muted">{{ store.name }}</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item"  v-for="(item, itemIndex) in store.list" :key="itemIndex">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" :id="item.label" :checked="item.bought" @change="this.saveState($event, this.shoppingList.id, storeIndex, itemIndex)">
+                                        <label class="form-check-label" :for="item.label" :class="{strike: item.bought}">{{ item.label }}</label>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </settings-menu>
     </div>
 </template>
 
 <script>
 import { defineComponent } from 'vue';
 import LoginModal from '../components/web/LoginModal.vue';
+import SettingsMenu from '../components/SettingsMenu.vue';
 import CalendarLink from '../components/CalendarLink.vue';
 
 export default defineComponent({
     name: 'ShoppingList',
     components: {
+        SettingsMenu,
         LoginModal,
-        CalendarLink,
+        //CalendarLink,
     },
     props: {
         shoppingListId: String,
