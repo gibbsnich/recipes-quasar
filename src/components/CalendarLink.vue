@@ -1,4 +1,5 @@
 <template>
+<!--
     <div class='fc fc-media-screen fc-direction-ltr fc-theme-standard'>
         <div class='fc-header-toolbar fc-toolbar fc-toolbar-ltr'>
             <div class='fc-toolbar-chunk'>
@@ -9,6 +10,8 @@
             </div>
         </div>
     </div>
+    -->
+    <slot></slot>
 </template>
 
 <script>

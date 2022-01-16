@@ -2,7 +2,7 @@ import { dateToString } from './date.js';
 
 export const recurEventToEvent = (recurEvent) => {
     const eventDate = dateToString(recurEvent.start);
-    if (recurEvent.title === "Mittagessen") {
+    if (recurEvent.title === "Mittagessen" || recurEvent.title === "Mittags") {
         return { 
             eventStart: `${eventDate}T12:00`,
             eventEnd: `${eventDate}T13:00`
