@@ -1,6 +1,6 @@
 <template>
     <div class="acol">
-        <h6 :class="[{'is-in-past': isInPastOrNextMonth }, {'is-today': isToday}]">
+        <h6 :class="['col-title', {'is-in-past': isInPastOrNextMonth }, {'is-today': isToday}]">
             {{ new Intl.DateTimeFormat('de-DE', {weekday: 'short', day: 'numeric', month: 'numeric'}).format(this.date) }}
         </h6>
         <span :class="['event-banner', 'mittag', {unknown: !this.middayEvent.extendedProps.recipeId}]" @click="this.$emit('clickedMidday', this.middayEvent)">&nbsp;{{ this.middayEvent.title }}</span>
@@ -100,44 +100,44 @@ export default defineComponent({
         flex-direction: column;
         flex-grow: 1;
         overflow-x: hidden;
-        padding-bottom: .3rem;
+        padding-bottom: .5rem;
         user-select: none;
-        margin-bottom: .2rem;
     }
     .event-banner {
        cursor: pointer;
        white-space: nowrap;
        font-size: .8rem;
     }
-    h6 {
+    h6.col-title {
         color: #333;
         overflow: hidden;
         white-space: nowrap;
         font-size: .8rem;
+        padding-left: .5rem;
     }
     h6.is-in-past {
-        color: #ccc;
+        color: #999;
     }
     h6.is-today {
-        color: #ff0000c4;
+        color: #a60000b8;
         font-weight: bold;
     }
     .mittag.unknown {
         background-color: #0080FF30;
     }
     .mittag {
-        background-color: #0080FF;
+        background-color: #0080FF5c;
     }
     .abend.unknown {
         background-color: #FF800030;
     }
     .abend {
-         background-color:#FF8000;
+         background-color:#FF80005c;
     }
     .zusatz.unknown {
         background-color: #8bc34a30;
     }
     .zusatz {
-        background-color: #8bc34a;
+        background-color: #8bc34a5c;
     }
 </style>

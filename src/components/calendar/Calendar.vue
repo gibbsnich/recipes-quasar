@@ -28,11 +28,15 @@
                     </button>
                 </div>
                 <div class="arow" v-for="index in weekNum" :key="index">
+                    <span class="kw-cell">
+                        {{ weekOfYear(day(dayNums(index)[0])) }}
+                    </span>
                     <calendar-cell v-for="j in dayNums(index)" :key="j" :akey="j" :date="day(j)" 
                         :class="[{'highlight': isSelected(j)}]"
                         @clickedMidday="clickedMidday" @clickedEvening="clickedEvening" @clickedAdditional="clickedAdditional"
                         @mousedown="mousedown(j)" @mouseup="mouseup(j)" @mouseover="mouseover(j)"
                         @touchstart="mousedown(j)" @touchend="mouseup(j)" @touchmove="touchmove($event)" />
+                    
                 </div>
             </div>    
         </site-menu>
@@ -91,6 +95,12 @@ export default defineComponent({
         this.firstDay = this.computeFirstDay(this.baseDate, true);
     },
     methods: {
+        weekOfYear(date) {
+            var oneJan = new Date(date.getFullYear(),0,1);
+            var numberOfDays = Math.floor((date - oneJan) / (24 * 60 * 60 * 1000));
+            var result = Math.ceil((date.getDay() + 1 + numberOfDays) / 7);
+            return result;
+        },
         monthTitle(date){
             return new Intl.DateTimeFormat('de-DE', { year: 'numeric', month: 'long' }).format(
                 this.computeFirstDay(date)
@@ -279,7 +289,7 @@ export default defineComponent({
     .calendar-container {
         margin-left: auto;
         margin-right: auto;
-        max-width:1240px;
+        max-width: 1240px;
     }
     .calendar-controls {
         text-align: center;
@@ -287,8 +297,16 @@ export default defineComponent({
     }
     .calendar-title {
         display: inline-block;
-        width:9rem;
-        margin-right:2rem;
-        margin-left:2rem
+        width: 9rem;
+        margin-right: 2rem;
+        margin-left: 2rem;
+    }
+    .kw-cell {
+        padding-top: 2rem;
+        padding-right: .3rem;
+        padding-left: .2rem;
+        font-size: .8rem;
+        background-color:#ddd;
+        width: 1.2rem;
     }
 </style>
