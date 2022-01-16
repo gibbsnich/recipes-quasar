@@ -150,19 +150,19 @@ export default defineComponent({
         background-color: #0080FF30;
     }
     .mittag {
-        background-color: #0080FF5c;
+        background-color: #0080FF7c;
     }
     .abend.unknown {
         background-color: #FF800030;
     }
     .abend {
-         background-color:#FF80005c;
+         background-color:#FF80007c;
     }
     .zusatz.unknown {
         background-color: #8bc34a30;
     }
     .zusatz {
-        background-color: #8bc34a5c;
+        background-color: #8bc34a7c;
     }
     .blink {
         background-color: #888!important;
