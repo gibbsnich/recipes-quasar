@@ -17,12 +17,12 @@
                     </ul>
                 </li>
             </template>
-            <div style="margin-left:auto;margin-right:auto;max-width:1240px;">
-                <div style="text-align:center; margin-bottom: .5rem">
+            <div class="calendar-container">
+                <div class="calendar-controls">
                     <button type="button" class="btn btn-outline-primary" @click="gotoPreviousMonth()">
                         <font-awesome-icon icon="caret-square-left" />
                     </button>
-                    <span style="display: inline-block;width:9rem; margin-right:2rem; margin-left:2rem">{{ this.monthTitle(this.baseDate) }}</span>
+                    <span class="calendar-title">{{ this.monthTitle(this.baseDate) }}</span>
                     <button type="button" class="btn btn-outline-primary" @click="gotoNextMonth()">
                         <font-awesome-icon icon="caret-square-right" />
                     </button>
@@ -274,7 +274,22 @@ export default defineComponent({
     @media(max-width: 575px) {
         .container {
             margin: 0;
-            padding:0;
+            padding: 0;
         }
+    }
+    .calendar-container {
+        margin-left: auto;
+        margin-right: auto;
+        max-width:1240px;
+    }
+    .calendar-controls {
+        text-align: center;
+        margin-bottom: .5rem;
+    }
+    .calendar-title {
+        display: inline-block;
+        width:9rem;
+        margin-right:2rem;
+        margin-left:2rem
     }
 </style>
