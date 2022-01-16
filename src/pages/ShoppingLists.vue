@@ -1,7 +1,7 @@
 <template>
     <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth" />
     <div :class="{blur_bg: !this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth}">
-        <settings-menu activeTab="shoppinglists">
+        <site-menu activeTab="shoppinglists">
             <div class="container">
                 <h4>Einkaufslisten</h4>
                 <table class="table" v-if="this.$store.getters.getShoppingLists.length > 0">
@@ -26,19 +26,19 @@
                 </table>
                 <h6 v-else>Keine Einkaufslisten</h6>
             </div>
-        </settings-menu>
+        </site-menu>
     </div>
 </template>
 
 <script>
 import { defineComponent } from 'vue';
-import SettingsMenu from '../components/SettingsMenu.vue';
+import SiteMenu from '../components/SiteMenu.vue';
 import LoginModal from '../components/web/LoginModal.vue';
 
 export default defineComponent({
   name: 'ingredients',
   components: {
-    SettingsMenu,
+    SiteMenu,
     LoginModal,
   },
   methods: {

@@ -1,8 +1,7 @@
 <template>
     <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth" />
     <div :class="{blur_bg: !this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth}">
-        <!--<calendar-link />-->
-        <settings-menu>
+        <site-menu>
             <h4>Einkaufsliste</h4>
             <div v-if="this.shoppingList">
                 <h6>{{ this.shoppingList.start }} &ndash; {{ this.shoppingList.end }}</h6>
@@ -22,19 +21,19 @@
                     </div>
                 </div>
             </div>
-        </settings-menu>
+        </site-menu>
     </div>
 </template>
 
 <script>
 import { defineComponent } from 'vue';
 import LoginModal from '../components/web/LoginModal.vue';
-import SettingsMenu from '../components/SettingsMenu.vue';
+import SiteMenu from '../components/SiteMenu.vue';
 
 export default defineComponent({
     name: 'ShoppingList',
     components: {
-        SettingsMenu,
+        SiteMenu,
         LoginModal,
     },
     props: {

@@ -1,12 +1,20 @@
 <template>
     <div :class="{blur_bg: (!this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth) || isSelectRecipeModalVisible || isRandomIngredientsModalVisible || isIngredientWithoutCategoryModalVisible}">
-        <settings-menu activeTab="">
+        <site-menu activeTab="">
             <template v-slot:items>
-                <li class="nav-item">
-                    <a :class="['nav-link', {disabled: selectedCells.length === 0}]" href="javascript:void(0)" @click="generateShoppingListClick()">Neue Einkaufsliste</a>
-                </li>
-                <li class="nav-item">
-                    <a :class="['nav-link', {disabled: selectedCells.length === 0}]" href="javascript:void(0)" @click="generatePDFClick()">PDF erzeugen</a>
+                <li class="nav-item dropdown">
+                    <a :class="['nav-link', 'dropdown-toggle', {show: this.showCreateDropDown}]" 
+                        href="javascript:void(0)" @click="this.showCreateDropDown = !this.showCreateDropDown" role="button">
+                        <font-awesome-icon icon="cart-plus" />&nbsp;Erzeugen
+                    </a>
+                    <ul :class="['dropdown-menu', {show: this.showCreateDropDown, disabled: selectedCells.length === 0}]">
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0)" @click="generateShoppingListClick()">Einkaufsliste</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="javascript:void(0)" @click="generatePDFClick()">PDF</a>
+                        </li>
+                    </ul>
                 </li>
             </template>
             <div style="margin-left:auto;margin-right:auto;max-width:1240px;">
@@ -27,7 +35,7 @@
                         @touchstart="mousedown(j)" @touchend="mouseup(j)" @touchmove="touchmove($event)" />
                 </div>
             </div>    
-        </settings-menu>
+        </site-menu>
     </div>
     <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth" />
     <select-recipe-modal :key="selectRecipeKey" v-show="isSelectRecipeModalVisible" @close="closeSelectRecipeModal" v-bind:event="selectRecipeModalEventInfo" />
@@ -42,7 +50,7 @@ import RandomIngredientsModal from '../RandomIngredientsModal.vue';
 import { UnknownIngredientsMixin } from '../UnknownIngredientsMixin.js';
 import IngredientWithoutCategoryModal from '../IngredientWithoutCategoryModal.vue';
 import LoginModal from '../web/LoginModal.vue';
-import SettingsMenu from '../SettingsMenu.vue';
+import SiteMenu from '../SiteMenu.vue';
 import CalendarCell from './CalendarCell.vue';
 import { dateToString } from '../../util/date.js';
 import { generatePDF, generateShoppingList } from '../../util/generatePDF.js';
@@ -54,7 +62,7 @@ export default defineComponent({
         RandomIngredientsModal,
         IngredientWithoutCategoryModal,
         LoginModal,
-        SettingsMenu,
+        SiteMenu,
         CalendarCell,
     },
     mixins: [UnknownIngredientsMixin],
@@ -66,6 +74,7 @@ export default defineComponent({
             lastSelectedCell: null,
             selectedCells: [],
             clickTimeout: null,
+            showCreateDropDown: false,
             weekNum: 6,
             selectRecipeKey: 1,
             isSelectRecipeModalVisible: false,
@@ -89,10 +98,12 @@ export default defineComponent({
             return `${months[a.getMonth()]} ${a.getYear() + 1900}`;
         },
         gotoPreviousMonth() {
+            this.selectedCells = [];
             this.baseDate.setMonth(this.baseDate.getMonth() - 1);
             this.firstDay = this.computeFirstDay(this.baseDate, true);
         },
         gotoNextMonth() {
+            this.selectedCells = [];
             this.baseDate.setMonth(this.baseDate.getMonth() + 1);
             this.firstDay = this.computeFirstDay(this.baseDate, true);
         },
@@ -118,9 +129,18 @@ export default defineComponent({
         mousedown(dayVal) {
             this.selectedCells = [];
             this.isMouseDown = true;
+            this.lastSelectedCell = null;
             this.clickTimeout = setTimeout(() => {
                 if (this.isMouseDown) {
-                    this.selectedCells = [dayVal];
+                    if (this.lastSelectedCell) {
+                        if (this.day(dayVal) < this.day(this.lastSelectedCell)) {
+                            this.selectedCells = [dayVal, this.lastSelectedCell];
+                        } else {
+                            this.selectedCells = [this.lastSelectedCell, dayVal];
+                        }
+                    } else {
+                        this.selectedCells = [dayVal];
+                    }
                 }
             }, 250);
         },
@@ -182,7 +202,7 @@ export default defineComponent({
             return this.selectedCells.indexOf(dayVal) !== -1;
         },
         fireSelection(start, end) {
-            console.log(`selected: ${start} - ${end}`);
+            //console.log(`selected: ${start} - ${end}`);
         },
         clickedMidday(event) {
             this.showSelectRecipeModalFromEvent(event);

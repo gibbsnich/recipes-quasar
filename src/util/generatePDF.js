@@ -5,7 +5,13 @@ import jsPDF, { AcroFormCheckBox } from 'jspdf';
 const MAX_PAGE_Y = 290;
 
 const generateIngredientData = ({start, end}, store) => {
-    const currentEvents = store.state.events.filter((e) => e.start && e.start >= start && e.start <= end).map((e) => toRaw(e));
+    const currentEvents = store.state.events.filter((e) => {
+        if (!e.start) {
+            return false;
+        }
+        const st = e.start.substring(0, e.start.length - 6);
+        return st >= start && st <= end;
+    }).map((e) => toRaw(e));
     //can contain multiple instances of the same recipe!
     const currentRecipes = currentEvents.filter((e) => !e.extendedProps.extra).map((e) => toRaw(store.state.recipes.filter((r) => r.id === e.extendedProps.recipeId)[0]));
     const allIngredientsPerRecipe = currentRecipes.map((r) => r.ingredients).flat(2);

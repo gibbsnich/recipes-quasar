@@ -1,15 +1,16 @@
 <template>
     <ul class="nav nav-tabs fixed-top" style="background-color:white;">
-
         <li class="nav-item">
-            <a :class="['nav-link', {active: activeTab === ''}]" href="javascript:void(0)" @click="goto('')">Kalender</a>
+            <a :class="['nav-link', {active: activeTab === ''}]" href="javascript:void(0)" @click="goto('')">
+                <font-awesome-icon icon="calendar" />&nbsp;Kalender
+            </a>
         </li>
-        
         <slot name="items"></slot>
-        
         <li class="nav-item dropdown">
             <a :class="['nav-link', 'dropdown-toggle', {show: this.showDropDown}]" 
-                href="javascript:void(0)" @click="toggleDropDown" role="button">Daten</a>
+                href="javascript:void(0)" @click="toggleDropDown" role="button">
+                <font-awesome-icon icon="file" />&nbsp;Daten
+            </a>
             <ul :class="['dropdown-menu', {show: this.showDropDown}]">
                 <li v-for="tab in tabs" v-bind:key="tab">
                     <a :class="['dropdown-item', {active: activeTab === tab.href}]" href="javascript:void(0)" @click="goto(tab.href)">{{ tab.name }}</a>
@@ -26,7 +27,7 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'SettingsMenu',
+  name: 'SiteMenu',
   props: {
     activeTab: String,
   },
@@ -56,9 +57,5 @@ export default defineComponent({
     .main-container {
         margin-top: 50px;
     }
-    @media(max-width: 500px) {
-        .main-container {
-            margin-top: 100px;
-        }
-    }
+    
 </style>
