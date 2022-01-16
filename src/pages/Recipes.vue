@@ -2,7 +2,7 @@
     <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth" />
     <ingredient-without-category-modal v-show="isIngredientWithoutCategoryModalVisible" @close="closeIngredientsWithoutCategoryModal" v-bind:ingredient="ingredientWithoutCategory" />
     <div :class="{blur_bg: (!this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth) || isIngredientWithoutCategoryModalVisible}">
-        <settings-menu activeTab="recipes">
+        <site-menu activeTab="recipes">
             <div class="container">
                 <div class="row">
                     <div class="col-sm-3">
@@ -41,7 +41,7 @@
                     </div>
                 </div>
             </div>
-        </settings-menu>
+        </site-menu>
     </div>
 </template>
 
@@ -51,7 +51,7 @@ import RecipeDetails from '../components/RecipeDetails.vue';
 import RecipeImporter from '../components/RecipeImporter.vue';
 import { UnknownIngredientsMixin } from '../components/UnknownIngredientsMixin.js';
 import IngredientWithoutCategoryModal from '../components/IngredientWithoutCategoryModal.vue';
-import SettingsMenu from '../components/SettingsMenu.vue';
+import SiteMenu from '../components/SiteMenu.vue';
 import LoginModal from '../components/web/LoginModal.vue';
 import Accordion from '../components/Accordion.vue';
 
@@ -61,7 +61,7 @@ export default defineComponent({
     RecipeDetails,
     RecipeImporter,
     IngredientWithoutCategoryModal,
-    SettingsMenu,
+    SiteMenu,
     LoginModal,
     Accordion,
   },

@@ -1,7 +1,7 @@
 <template>
     <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth" />
     <div :class="{blur_bg: (!this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth)}">
-      <settings-menu activeTab="categories">
+      <site-menu activeTab="categories">
         <div class="container">
             <h4>Kategorien</h4>
             <category-table name="Rezeptkategorie" v-if="getSortedRecipeCategories().length > 0" @save="saveRecipeCategory" v-bind:categoryItemsGetter="getSortedRecipeCategories" v-bind:refresh="this.$store.state.isInitialized" />
@@ -11,20 +11,20 @@
             <category-table name="Zutatenladen" v-if="getSortedIngredientStores().length > 0" @save="saveIngredientStore" v-bind:categoryItemsGetter="getSortedIngredientStores" v-bind:refresh="this.$store.state.isInitialized" />
             <h6 v-else>Keine Zutatenläden</h6>
         </div>
-      </settings-menu>
+      </site-menu>
     </div>
 </template>
 
 <script>
 import { defineComponent } from 'vue';
-import SettingsMenu from '../components/SettingsMenu.vue';
+import SiteMenu from '../components/SiteMenu.vue';
 import CategoryTable from '../components/CategoryTable.vue';
 import LoginModal from '../components/web/LoginModal.vue';
 
 export default defineComponent({
   name: 'categories',
   components: {
-    SettingsMenu,
+    SiteMenu,
     CategoryTable,
     LoginModal,
   },
