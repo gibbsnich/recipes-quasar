@@ -10,11 +10,13 @@
                 </li>
             </template>
             <div style="margin-left:auto;margin-right:auto;max-width:1240px;">
-                <div class="arow" v-for="index in 6" :key="index">
+                <div style="text-align:center; margin-bottom: .5rem">
+                    <button type="button" class="btn btn-outline-primary" @click="gotoPreviousMonth()">ᐊ</button>
+                    <span style="display: inline-block;width:9rem; margin-right:2rem; margin-left:2rem">{{ this.monthTitle(this.baseDate) }}</span>
+                    <button type="button" class="btn btn-outline-primary" @click="gotoNextMonth()">ᐅ</button>
+                </div>
+                <div class="arow" v-for="index in weekNum" :key="index">
                     <calendar-cell v-for="j in dayNums(index)" :key="j" :akey="j" :date="day(j)" 
-                        v-bind:middayEvent="eventCache[`${j}_12`]" 
-                        v-bind:eveningEvent="eventCache[`${j}_18`]" 
-                        v-bind:additionalEvent="eventCache[`${j}_14`]"
                         :class="[{'highlight': isSelected(j)}]"
                         @clickedMidday="clickedMidday" @clickedEvening="clickedEvening" @clickedAdditional="clickedAdditional"
                         @mousedown="mousedown(j)" @mouseup="mouseup(j)" @mouseover="mouseover(j)"
@@ -30,7 +32,7 @@
 </template>
 
 <script>
-import { defineComponent, reactive } from 'vue';
+import { defineComponent } from 'vue';
 import SelectRecipeModal from '../SelectRecipeModal.vue';
 import RandomIngredientsModal from '../RandomIngredientsModal.vue';
 import { UnknownIngredientsMixin } from '../UnknownIngredientsMixin.js';
@@ -54,17 +56,13 @@ export default defineComponent({
     mixins: [UnknownIngredientsMixin],
     data() {
         return {
-            //numDays: 25,
             firstDay: null,
-            //rows: [1,2,3,4,5],
-            //days: [],
+            baseDate: null,
             isMouseDown: false,
             lastSelectedCell: null,
             selectedCells: [],
             clickTimeout: null,
-
-            eventCache: {},
-
+            weekNum: 6,
             selectRecipeKey: 1,
             isSelectRecipeModalVisible: false,
             selectRecipeModalEventInfo: null,
@@ -76,34 +74,33 @@ export default defineComponent({
         }
     },
     beforeMount() {
-        this.firstDay = new Date();
-        while (this.firstDay.getDate() !== 1) {
-            this.firstDay = new Date(this.firstDay.setDate(this.firstDay.getDate() - 1));
-        }
-        while (this.firstDay.getDay() !== 1) {
-            this.firstDay = new Date(this.firstDay.setDate(this.firstDay.getDate() - 1));
-        }
-        for (let n = 0; n < 42; n++) {
-            const dateStr = dateToString(this.day(n));
-            [12, 14, 18].forEach((time) => {
-                const event = this.$store.getters.getEventByStart(`${dateStr}T${time}:00`);
-                if (event) {
-                    this.eventCache[`${n}_${time}`] = event;
-                } else {
-                    const newEvent = reactive({
-                        eventStart: `${dateStr}T${time}:00`,
-                        start: this.day(n),
-                        title: time === 12 ? 'Mittagessen' : 'Abendessen',
-                        extendedProps: {recur: true, ingredients: []},
-                    });
-                    this.eventCache[`${n}_${time}`] = newEvent;
-                }
-            });
-        }
+        this.baseDate = new Date();
+        this.firstDay = this.computeFirstDay(this.baseDate, true);
     },
     methods: {
-        getEvent(dayVal, time) {
-            return this.eventCache[`${dayVal}_${time}`];
+        monthTitle(date){
+            const a = this.computeFirstDay(date);
+            const months = ["Januar", "Februar", "März", "April", "Mai", "Juni",
+                "Juli", "August", "September", "Oktober", "November", "Dezember"];
+            return `${months[a.getMonth()]} ${a.getYear() + 1900}`;
+        },
+        gotoPreviousMonth() {
+            this.baseDate.setMonth(this.baseDate.getMonth() - 1);
+            this.firstDay = this.computeFirstDay(this.baseDate, true);
+        },
+        gotoNextMonth() {
+            this.baseDate.setMonth(this.baseDate.getMonth() + 1);
+            this.firstDay = this.computeFirstDay(this.baseDate, true);
+        },
+        computeFirstDay(date, withPreviousWeek) {
+            while (date.getDate() !== 1) {
+                date = new Date(date.setDate(date.getDate() - 1));
+            }
+            if (withPreviousWeek)
+            while (date.getDay() !== 1) {
+                date = new Date(date.setDate(date.getDate() - 1));
+            }
+            return date;
         },
         day(num) {
             return new Date(new Date().setTime(this.firstDay.getTime() + (num * (1000*60*60*24))));
@@ -183,54 +180,27 @@ export default defineComponent({
         fireSelection(start, end) {
             console.log(`selected: ${start} - ${end}`);
         },
-        clickedMidday(event) {//dayVal) {
-            // this.showSelectRecipeModal(dayVal, 12);
-            // console.log(`midday ${dayVal}`)
+        clickedMidday(event) {
             this.showSelectRecipeModalFromEvent(event);
         },
-        clickedEvening(event) {//dayVal) {
-            // this.showSelectRecipeModal(dayVal, 18);
-            // console.log(`evening ${dayVal}`)
-
+        clickedEvening(event) {
             this.showSelectRecipeModalFromEvent(event);
         },
-        // clickedAdditional(dayVal) {
-        //     this.randomIngredientsDate = dateToString(this.day(dayVal));
-        //     //this.randomIngredientKey += 1;
-        //     this.isRandomIngredientsModalVisible = true;
-        //     console.log(`additional ${dayVal}`)
-        // },
         clickedAdditional(date) {
             this.randomIngredientsDate = dateToString(date);
-            //this.randomIngredientKey += 1;
             this.isRandomIngredientsModalVisible = true;
-            // console.log(`additional ${dayVal}`)
         },
         showSelectRecipeModalFromEvent(event) {
             this.selectRecipeKey += 1;
             this.selectRecipeModalEventInfo = event;
             this.isSelectRecipeModalVisible = true;
         },
-        // showSelectRecipeModal(dayVal, time) {
-        //     const dateStr = dateToString(this.day(dayVal));
-        //     const event = this.getEvent(dayVal, time);//this.$store.getters.getEventByStart(`${dateStr}T${time}:00`);
-        //     this.selectRecipeKey += 1;
-        //     if (event) {
-        //         this.selectRecipeModalEventInfo = event;
-        //     } else {
-        //         const date = this.day(dayVal);
-        //         date.setHours(time);
-        //         this.selectRecipeModalEventInfo = this.getEvent(dayVal, time);
-        //     }
-        //     this.isSelectRecipeModalVisible = true;
-        // },
         closeSelectRecipeModal(selectedRecipe) {
             this.isSelectRecipeModalVisible = false;
             if (selectedRecipe) {
                 this.selectRecipeModalEventInfo.recipeId = selectedRecipe;
                 this.$store.dispatch('storeRecipeEvent', this.selectRecipeModalEventInfo);
             }
-            //this.selectRecipeModalEventInfo = null;
         },
         closeRandomIngredientsModal(ingredientsEvent) {
             this.isRandomIngredientsModalVisible = false;
@@ -242,7 +212,6 @@ export default defineComponent({
                     this.newIngredientsEvent = ingredientsEvent;
                     this.unknownIngredients = ingredientsEvent.extendedProps.ingredients;
                 } else {
-                    //todo delete event if empty ingredients
                     this.$store.dispatch('storeEvent', ingredientsEvent);
                 }
             }
@@ -259,7 +228,7 @@ export default defineComponent({
             generatePDF(this.makeCurrentSelection(), this.$store);
         },
         generateShoppingListClick() {
-            const newShoppingList = generateShoppingList(/*{start: this.currentSelection.start, end: this.currentSelection.end}*/this.makeCurrentSelection(), this.$store);
+            const newShoppingList = generateShoppingList(this.makeCurrentSelection(), this.$store);
             this.$store.dispatch('storeShoppingList', newShoppingList);
             this.$router.push(`/shopping-list/${newShoppingList.id}`);
         },

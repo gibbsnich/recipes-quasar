@@ -213,7 +213,7 @@ export default store(function (/* { ssrContext } */) {
           if (!recipe)
               return;
           const { eventStart, eventEnd } = event.extendedProps.recur ? 
-              recurEventToEvent(event) : {eventStart: event.eventStart, eventEnd: null};
+              recurEventToEvent(event) : {eventStart: event.start, eventEnd: null};
           
           const startISO = eventStart ? eventStart : dateToTimeString(event.start);
           const selEvent = state.events.find((evt) => evt.start === startISO);

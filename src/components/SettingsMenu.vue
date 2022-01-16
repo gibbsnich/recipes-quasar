@@ -27,7 +27,7 @@
                             <a :class="['nav-link', {active: activeTab === tab.href}]" href="javascript:void(0)" @click="goto(tab.href)">{{ tab.name }}</a>
                         </li> -->
                     </ul>
-                    <div style="margin-top:50px">
+                    <div class="main-container">
                         <slot></slot>
                     </div>
                     <!--
@@ -69,3 +69,14 @@ export default defineComponent({
   }
 });
 </script>
+
+<style scoped>
+    .main-container {
+        margin-top: 50px;
+    }
+    @media(max-width: 500px) {
+        .main-container {
+            margin-top: 100px;
+        }
+    }
+</style>

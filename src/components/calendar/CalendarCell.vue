@@ -4,8 +4,8 @@
             {{ new Intl.DateTimeFormat('de-DE', {weekday: 'short'}).format(this.date) }}
             {{ this.date.getDate() }}.{{ this.date.getMonth()+1 }}.
         </h6>
-        <span :class="['event-banner', 'mittag', {unknown: !this.middayEvent.extendedProps.recipeId}]" @click="this.$emit('clickedMidday', this.middayEvent)">&nbsp;Mittags</span>
-        <span :class="['event-banner', 'abend', {unknown: !this.eveningEvent.extendedProps.recipeId}]" @click="this.$emit('clickedEvening', this.eveningEvent)">&nbsp;Abends</span>
+        <span :class="['event-banner', 'mittag', {unknown: !this.middayEvent.extendedProps.recipeId}]" @click="this.$emit('clickedMidday', this.middayEvent)">&nbsp;{{ this.middayEvent.title }}</span>
+        <span :class="['event-banner', 'abend', {unknown: !this.eveningEvent.extendedProps.recipeId}]" @click="this.$emit('clickedEvening', this.eveningEvent)">&nbsp;{{ this.eveningEvent.title }}</span>
         <span :class="['event-banner', 'zusatz', {unknown: this.additionalEvent.extendedProps.ingredients.length === 0}]" @click="this.$emit('clickedAdditional', this.date)">&nbsp;Zusatz</span>
     </div>
 </template>
@@ -19,22 +19,6 @@ export default defineComponent({
     emits: ['clickedMidday', 'clickedEvening', 'clickedAdditional'],
     props: {
         date: Date,
-        // middayEvent: Object,
-        // eveningEvent: Object,
-        // additionalEvent: Object,
-    },
-    data() {
-        return {
-            // middayEvent: null,
-            // eveningEvent: null,
-            // additionalEvent: null,
-        }
-    },
-    beforeMount() {
-        // const dateStr = dateToString(this.date);
-        // this.middayEvent = this.$store.getters.getEventByStart(`${dateStr}T12:00`);
-        // this.eveningEvent = this.$store.getters.getEventByStart(`${dateStr}T18:00`);
-        // this.additionalEvent = this.$store.getters.getIngredientEventByStart(`${dateStr}T14:00`);
     },
     computed: {
         middayEvent: {
@@ -48,7 +32,7 @@ export default defineComponent({
                     const newEvent = reactive({
                         eventStart: `${dateStr}T${time}:00`,
                         start: this.date,
-                        title: time === 12 ? 'Mittagessen' : 'Abendessen',
+                        title: time === 12 ? 'Mittags' : 'Abends',
                         extendedProps: {recur: true, ingredients: []},
                     });
                     return newEvent;
@@ -66,7 +50,7 @@ export default defineComponent({
                     const newEvent = reactive({
                         eventStart: `${dateStr}T${time}:00`,
                         start: this.date,
-                        title: time === 12 ? 'Mittagessen' : 'Abendessen',
+                        title: time === 12 ? 'Mittags' : 'Abends',
                         extendedProps: {recur: true, ingredients: []},
                     });
                     return newEvent;
@@ -107,14 +91,6 @@ export default defineComponent({
             }
         },
     },
-    methods: {
-        // isInPast() {
-        //     const myTime = this.date.getTime();
-        //     const compTime = new Date().setHours(0).getTime();
-        //     debugger;
-        //     return myTime < compTime;
-        // }
-    }
 });
 </script>
 
@@ -131,11 +107,14 @@ export default defineComponent({
     }
     .event-banner {
        cursor: pointer;
+       white-space: nowrap;
+       font-size: .8rem;
     }
     h6 {
         color: #333;
         overflow: hidden;
         white-space: nowrap;
+        font-size: .8rem;
     }
     h6.is-in-past {
         color: #ccc;
