@@ -92,10 +92,9 @@ export default defineComponent({
     },
     methods: {
         monthTitle(date){
-            const a = this.computeFirstDay(date);
-            const months = ["Januar", "Februar", "März", "April", "Mai", "Juni",
-                "Juli", "August", "September", "Oktober", "November", "Dezember"];
-            return `${months[a.getMonth()]} ${a.getYear() + 1900}`;
+            return new Intl.DateTimeFormat('de-DE', { year: 'numeric', month: 'long' }).format(
+                this.computeFirstDay(date)
+            );
         },
         gotoPreviousMonth() {
             this.selectedCells = [];
