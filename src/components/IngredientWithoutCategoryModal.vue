@@ -6,7 +6,7 @@
                 <h5 class="modal-title">Zutaten ohne Kategorie</h5>
             </div>
             <div class="modal-body">
-                <p>Neue Zutat ohne Zuordnung gefunden: <b>{{ ingredientName }}</b></p>
+                <p>Neue Zutat ohne Zuordnung gefunden: <b>{{ ingredientName }}</b></p> <!-- todo: hier nochmal änderbar machen -->
                 <div>
                     <div class="card">
                         <div class="card-body">
