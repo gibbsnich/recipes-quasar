@@ -132,11 +132,14 @@ export default defineComponent({
             this.lastSelectedCell = null;
             this.clickTimeout = setTimeout(() => {
                 if (this.isMouseDown) {
+                    //debugger;
                     if (this.lastSelectedCell) {
-                        if (this.day(dayVal) < this.day(this.lastSelectedCell)) {
-                            this.selectedCells = [dayVal, this.lastSelectedCell];
-                        } else {
-                            this.selectedCells = [this.lastSelectedCell, dayVal];
+                        if (this.selectedCells.indexOf(dayVal) === -1 || this.selectedCells.indexOf(this.lastSelectedCell) === -1) {
+                            if (this.day(dayVal) < this.day(this.lastSelectedCell)) {
+                                this.selectedCells = [dayVal, this.lastSelectedCell];
+                            } else {
+                                this.selectedCells = [this.lastSelectedCell, dayVal];
+                            }
                         }
                     } else {
                         this.selectedCells = [dayVal];
