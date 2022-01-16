@@ -11,9 +11,13 @@
             </template>
             <div style="margin-left:auto;margin-right:auto;max-width:1240px;">
                 <div style="text-align:center; margin-bottom: .5rem">
-                    <button type="button" class="btn btn-outline-primary" @click="gotoPreviousMonth()">ᐊ</button>
+                    <button type="button" class="btn btn-outline-primary" @click="gotoPreviousMonth()">
+                        <font-awesome-icon icon="caret-square-left" />
+                    </button>
                     <span style="display: inline-block;width:9rem; margin-right:2rem; margin-left:2rem">{{ this.monthTitle(this.baseDate) }}</span>
-                    <button type="button" class="btn btn-outline-primary" @click="gotoNextMonth()">ᐅ</button>
+                    <button type="button" class="btn btn-outline-primary" @click="gotoNextMonth()">
+                        <font-awesome-icon icon="caret-square-right" />
+                    </button>
                 </div>
                 <div class="arow" v-for="index in weekNum" :key="index">
                     <calendar-cell v-for="j in dayNums(index)" :key="j" :akey="j" :date="day(j)" 

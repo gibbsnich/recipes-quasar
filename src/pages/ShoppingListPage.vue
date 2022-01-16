@@ -30,14 +30,12 @@
 import { defineComponent } from 'vue';
 import LoginModal from '../components/web/LoginModal.vue';
 import SettingsMenu from '../components/SettingsMenu.vue';
-import CalendarLink from '../components/CalendarLink.vue';
 
 export default defineComponent({
     name: 'ShoppingList',
     components: {
         SettingsMenu,
         LoginModal,
-        //CalendarLink,
     },
     props: {
         shoppingListId: String,

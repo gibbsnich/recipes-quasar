@@ -1,14 +1,13 @@
-import { boot } from 'quasar/wrappers'
+import { boot } from 'quasar/wrappers';
 
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap';
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faSave, faPlusSquare, faMinusSquare } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faSave, faPlusSquare, faMinusSquare, faCaretSquareLeft, faCaretSquareRight } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 export default boot(({ app }) => {
-    library.add(faSave, faPlusSquare, faMinusSquare)
-    app.component('font-awesome-icon', FontAwesomeIcon)
-    
+    library.add(faSave, faPlusSquare, faMinusSquare, faCaretSquareLeft, faCaretSquareRight);
+    app.component('font-awesome-icon', FontAwesomeIcon); 
 });
