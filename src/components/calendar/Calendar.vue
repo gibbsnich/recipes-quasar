@@ -3,11 +3,11 @@
         <site-menu activeTab="">
             <template v-slot:items>
                 <li class="nav-item dropdown">
-                    <a :class="['nav-link', 'dropdown-toggle', {show: this.showCreateDropDown}]" 
+                    <a :class="['nav-link', 'dropdown-toggle', {show: this.showCreateDropDown, disabled: selectedCells.length === 0}]"
                         href="javascript:void(0)" @click="this.showCreateDropDown = !this.showCreateDropDown" role="button">
                         <font-awesome-icon icon="cart-plus" />&nbsp;Erzeugen
                     </a>
-                    <ul :class="['dropdown-menu', {show: this.showCreateDropDown, disabled: selectedCells.length === 0}]" ref="dropDown">
+                    <ul :class="['dropdown-menu', {show: this.showCreateDropDown}]" ref="dropDown">
                         <li>
                             <a class="dropdown-item" href="javascript:void(0)" @click="generateShoppingListClick()">Einkaufsliste</a>
                         </li>
