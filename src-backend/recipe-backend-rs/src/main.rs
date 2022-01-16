@@ -9,7 +9,7 @@ mod lib;
 mod api;
 
 const COOKIE_NAME: &str = "rcookie";
-const ALLOWED_ORIGIN: &str = "http://localhost:63080";
+const ALLOWED_ORIGIN: &str = "http://localhost:65080";
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -30,9 +30,9 @@ async fn main() -> std::io::Result<()> {
             .wrap(IdentityService::new(
                 CookieIdentityPolicy::new(&private_key)
                     .name(COOKIE_NAME)
-                    //.domain("XXX.net")
-                    .path("/")
-                    .max_age(600) //seconds
+                    // .domain("XXX.net")
+                    // .path("/rapi")
+                    .max_age(60 * 60) //in seconds
                     .same_site(SameSite::None) // `Lax` by default, but POST isn't allowed for cross-site, though.
                     .secure(true),
             ))

@@ -30,13 +30,13 @@
     "@fullcalendar/timegrid": "^5.10.1",
     "@fullcalendar/vue3": "^5.10.1",
     "@popperjs/core": "^2.11.2",
-    "@quasar/extras": "^1.0.0",
+    "@quasar/extras": "^1.12.3",
     "axios": "^0.21.1",
     "bootstrap": "^5.1.3",
     "cheerio": "^1.0.0-rc.10",
     "core-js": "^3.6.5",
     "jspdf": "^2.5.0",
-    "quasar": "^2.4.3",
+    "quasar": "^2.4.7",
     "vuex": "^4.0.1"
   },
   "devDependencies": {
