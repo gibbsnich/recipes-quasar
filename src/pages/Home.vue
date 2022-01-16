@@ -1,15 +1,15 @@
 <template>
-  <NextCalendar />
+  <Calendar />
 </template>
 
 <script>
 import { defineComponent } from 'vue';
-import NextCalendar from '../components/calendar/NextCalendar.vue';
+import Calendar from '../components/calendar/Calendar.vue';
 
 export default defineComponent({
   name: 'home',
   components: {
-    NextCalendar,
+    Calendar,
   }
 });
 </script>
