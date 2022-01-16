@@ -1,8 +1,7 @@
 <template>
     <div class="acol">
         <h6 :class="[{'is-in-past': isInPastOrNextMonth }, {'is-today': isToday}]">
-            {{ new Intl.DateTimeFormat('de-DE', {weekday: 'short'}).format(this.date) }}
-            {{ this.date.getDate() }}.{{ this.date.getMonth()+1 }}.
+            {{ new Intl.DateTimeFormat('de-DE', {weekday: 'short', day: 'numeric', month: 'numeric'}).format(this.date) }}
         </h6>
         <span :class="['event-banner', 'mittag', {unknown: !this.middayEvent.extendedProps.recipeId}]" @click="this.$emit('clickedMidday', this.middayEvent)">&nbsp;{{ this.middayEvent.title }}</span>
         <span :class="['event-banner', 'abend', {unknown: !this.eveningEvent.extendedProps.recipeId}]" @click="this.$emit('clickedEvening', this.eveningEvent)">&nbsp;{{ this.eveningEvent.title }}</span>
