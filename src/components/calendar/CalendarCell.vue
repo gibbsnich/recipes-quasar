@@ -3,9 +3,15 @@
         <h6 :class="['col-title', {'is-in-past': isInPastOrNextMonth }, {'is-today': isToday}]">
             {{ new Intl.DateTimeFormat('de-DE', {weekday: 'short', day: 'numeric', month: 'numeric'}).format(this.date) }}
         </h6>
-        <span :class="['event-banner', 'mittag', {unknown: !this.middayEvent.extendedProps.recipeId}]" @click="this.$emit('clickedMidday', this.middayEvent)">&nbsp;{{ this.middayEvent.title }}</span>
-        <span :class="['event-banner', 'abend', {unknown: !this.eveningEvent.extendedProps.recipeId}]" @click="this.$emit('clickedEvening', this.eveningEvent)">&nbsp;{{ this.eveningEvent.title }}</span>
-        <span :class="['event-banner', 'zusatz', {unknown: this.additionalEvent.extendedProps.ingredients.length === 0}]" @click="this.$emit('clickedAdditional', this.date)">&nbsp;Zusatz</span>
+        <span :class="['event-banner', 'mittag', {unknown: !this.middayEvent.extendedProps.recipeId}]" @click="this.middayClicked($event)">
+            &nbsp;{{ this.middayEvent.title }}
+        </span>
+        <span :class="['event-banner', 'abend', {unknown: !this.eveningEvent.extendedProps.recipeId}]" @click="this.eveningClicked($event)">
+            &nbsp;{{ this.eveningEvent.title }}
+        </span>
+        <span :class="['event-banner', 'zusatz', {unknown: this.additionalEvent.extendedProps.ingredients.length === 0}]" @click="this.additionalClicked($event)">
+            &nbsp;Zusatz
+        </span>
     </div>
 </template>
 
@@ -90,6 +96,24 @@ export default defineComponent({
             }
         },
     },
+    methods: {
+        blink(event, fn) {
+            event.target.classList.add('blink');
+            setTimeout(() => { 
+                event.target.classList.remove('blink');
+                fn();
+            }, 50);
+        },
+        middayClicked(event) {
+            this.blink(event, () => this.$emit('clickedMidday', this.middayEvent));
+        },
+        eveningClicked(event) {
+            this.blink(event, () => this.$emit('clickedEvening', this.eveningEvent));
+        },
+        additionalClicked(event) {
+            this.blink(event, () => this.$emit('clickedAdditional', this.date));
+        },
+    },
 });
 </script>
 
@@ -139,5 +163,8 @@ export default defineComponent({
     }
     .zusatz {
         background-color: #8bc34a5c;
+    }
+    .blink {
+        background-color: #888!important;
     }
 </style>

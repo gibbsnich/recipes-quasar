@@ -11,7 +11,7 @@
                 href="javascript:void(0)" @click="toggleDropDown" role="button">
                 <font-awesome-icon icon="file" />&nbsp;Daten
             </a>
-            <ul :class="['dropdown-menu', {show: this.showDropDown}]">
+            <ul :class="['dropdown-menu', {show: this.showDropDown}]" ref="dropDown">
                 <li v-for="tab in tabs" v-bind:key="tab">
                     <a :class="['dropdown-item', {active: activeTab === tab.href}]" href="javascript:void(0)" @click="goto(tab.href)">{{ tab.name }}</a>
                 </li>
@@ -42,7 +42,20 @@ export default defineComponent({
           showDropDown: false,
       }
   },
+  beforeMount() {
+      document.addEventListener('mousedown', this.checkToggleDropDown);
+      document.addEventListener('touchstart', this.checkToggleDropDown);
+  },
+  beforeUnmount() {
+      document.removeEventListener('mousedown', this.checkToggleDropDown);
+      document.removeEventListener('touchstart', this.checkToggleDropDown);
+  },
   methods: {
+      checkToggleDropDown(event) {
+          if (!this.$refs.dropDown.contains(event.target)) {
+              this.showDropDown = false;
+          }
+      },
       toggleDropDown() {
           this.showDropDown = !this.showDropDown;
       },

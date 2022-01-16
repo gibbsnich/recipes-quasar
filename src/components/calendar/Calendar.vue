@@ -7,7 +7,7 @@
                         href="javascript:void(0)" @click="this.showCreateDropDown = !this.showCreateDropDown" role="button">
                         <font-awesome-icon icon="cart-plus" />&nbsp;Erzeugen
                     </a>
-                    <ul :class="['dropdown-menu', {show: this.showCreateDropDown, disabled: selectedCells.length === 0}]">
+                    <ul :class="['dropdown-menu', {show: this.showCreateDropDown, disabled: selectedCells.length === 0}]" ref="dropDown">
                         <li>
                             <a class="dropdown-item" href="javascript:void(0)" @click="generateShoppingListClick()">Einkaufsliste</a>
                         </li>
@@ -36,7 +36,6 @@
                         @clickedMidday="clickedMidday" @clickedEvening="clickedEvening" @clickedAdditional="clickedAdditional"
                         @mousedown="mousedown(j)" @mouseup="mouseup(j)" @mouseover="mouseover(j)"
                         @touchstart="mousedown(j)" @touchend="mouseup(j)" @touchmove="touchmove($event)" />
-                    
                 </div>
             </div>    
         </site-menu>
@@ -93,8 +92,19 @@ export default defineComponent({
     beforeMount() {
         this.baseDate = new Date();
         this.firstDay = this.computeFirstDay(this.baseDate, true);
+        document.addEventListener('mousedown', this.checkToggleDropDown);
+        document.addEventListener('touchstart', this.checkToggleDropDown);
+    },
+    beforeUnmount() {
+        document.removeEventListener('mousedown', this.checkToggleDropDown);
+        document.removeEventListener('touchstart', this.checkToggleDropDown);
     },
     methods: {
+        checkToggleDropDown(event) {
+            if (!this.$refs.dropDown.contains(event.target)) {
+                this.showCreateDropDown = false;
+            }
+        },
         weekOfYear(date) {
             var oneJan = new Date(date.getFullYear(),0,1);
             var numberOfDays = Math.floor((date - oneJan) / (24 * 60 * 60 * 1000));
@@ -305,8 +315,10 @@ export default defineComponent({
         padding-top: 2rem;
         padding-right: .3rem;
         padding-left: .2rem;
+        font-weight: 700;
         font-size: .8rem;
-        background-color:#ddd;
+        color: #555;
+        background-color: #ddd;
         width: 1.2rem;
     }
 </style>
