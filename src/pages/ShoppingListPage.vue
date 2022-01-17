@@ -20,6 +20,9 @@
                         </div>
                     </div>
                 </div>
+                <button type="button" class="delete-button btn btn-outline-danger" @click="deleteList">
+                    <font-awesome-icon icon="trash" />&nbsp;Einkaufsliste löschen
+                </button>
             </div>
         </site-menu>
     </div>
@@ -50,6 +53,10 @@ export default defineComponent({
         saveState(event, listId, storeIndex, itemIndex) {
             this.$store.dispatch('toggleShoppingListItem', { listId, storeIndex, itemIndex, checked: event.target.checked} );
         },
+        deleteList() {
+            this.$store.dispatch('deleteShoppingList', this.shoppingList.id);
+            this.$router.push('/shoppinglists');
+        },
     },
 });
 </script>
@@ -67,5 +74,10 @@ export default defineComponent({
     label.strike {
         text-decoration: line-through;
         color: #aaa;
+    }
+    .delete-button {
+        margin-left: 5rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
     }
 </style>
