@@ -145,6 +145,17 @@ export default store(function (/* { ssrContext } */) {
               state.recipes[recipeIndex] = recipe;
           }
       },
+      deleteRecipe(state, recipe) {
+          const recipeIndex = state.recipes.findIndex(r => r.id === recipe.id);
+          state.recipes.splice(recipeIndex, 1);
+          let idx;
+          do {
+              idx = state.events.findIndex(e => e.extendedProps.recipeId === recipe.id);
+              if (idx !== -1) {
+                  state.events.splice(idx, 1);
+              }
+          } while (idx !== -1);
+      },
       updateRecipes(state, ingredient) {
           state.recipes.forEach(r => {
               r.ingredients.forEach((ri, index) => {
@@ -309,6 +320,10 @@ export default store(function (/* { ssrContext } */) {
       async storeRecipe({ commit, state }, recipe) {
           commit('storeRecipe', recipe);
           saveAndCheckNetwork(['recipes'], commit, state);
+      },
+      async deleteRecipe({ commit, state}, recipe) {
+          commit('deleteRecipe', recipe);
+          saveAndCheckNetwork(['recipes', 'events'], commit, state);
       },
       async changeRecipeOrder({ commit, state }, { changeId, beforeId }) {
           commit('changeRecipeOrder', { changeId, beforeId });

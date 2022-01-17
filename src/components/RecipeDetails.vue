@@ -28,8 +28,8 @@
             <div class="col-sm-7">
                 <input type="text" class="form-control" placeholder="Neue Kategorie" v-model.trim="newRecipeCategoryName">
             </div>
-            <div class="col-sm-1">
-                <button type="button" id="save-recipe-category-button" :class="['btn', 'btn-primary', {disabled: newRecipeCategoryName.length === 0 || this.$store.getters.getRecipeCategoryByName(newRecipeCategoryName)}]" @click="saveNewRecipeCategory">Speichern</button>
+            <div class="col-sm-2">
+                <button type="button" id="save-recipe-category-button" :class="['btn', 'btn-primary', {disabled: newRecipeCategoryName.length === 0 || this.$store.getters.getRecipeCategoryByName(newRecipeCategoryName)}]" @click="saveNewRecipeCategory"><font-awesome-icon icon="save" />&nbsp;Speichern</button>
             </div>
         </div>
     </div>
@@ -41,7 +41,14 @@
         <h5>Zubereitung:</h5>
         <textarea class="form-control" rows="20" v-model="currentRecipe.preparation" />
     </div>
-    <button id="save-button" type="button" class="btn btn-primary" :disabled="currentRecipe.name === ''" @click="saveRecipe" >Rezept speichern</button>
+    <div class="row mb-3">
+        <div class="col-xs-6">
+            <button id="save-button" type="button" class="btn btn-primary" :disabled="currentRecipe.name === ''" @click="saveRecipe" ><font-awesome-icon icon="save" />&nbsp;Rezept speichern</button>
+        </div>
+        <div class="col-xs-6">
+            <button id="save-button" type="button" class="btn btn-danger" :disabled="!currentRecipe.id" @click="deleteRecipe" ><font-awesome-icon icon="trash" />&nbsp;Rezept löschen</button>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -50,7 +57,7 @@ import IngredientsList from './IngredientsList.vue';
 
 export default defineComponent({
     name: 'RecipeDetails',
-    emits: ['save'],
+    emits: ['save', 'delete'],
     components: {
         IngredientsList,
     },
@@ -106,6 +113,10 @@ export default defineComponent({
             this.$emit('save', this.currentRecipe);
             //keep current recipe visible after save
             //this.currentRecipe = this.makeEmptyRecipe();
+        },
+        deleteRecipe() {
+            this.$emit('delete', this.currentRecipe);
+            this.currentRecipe = this.makeEmptyRecipe();
         },
         makeEmptyRecipe() {
             return {name: '', serving: {value: '', type: ''}, ingredients: [], preparation: '', url: '', recipeCategories: []};

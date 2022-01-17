@@ -6,12 +6,12 @@ import 'bootstrap';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSave, faPlusSquare, faMinusSquare, 
             faCaretSquareLeft, faCaretSquareRight, faCartPlus,
-            faFile, faCalendar } from '@fortawesome/free-solid-svg-icons';
+            faFile, faCalendar, faTrash, faFileImport } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 export default boot(({ app }) => {
     library.add(faSave, faPlusSquare, faMinusSquare, 
         faCaretSquareLeft, faCaretSquareRight, faCartPlus,
-        faFile, faCalendar );
+        faFile, faCalendar, faTrash, faFileImport );
     app.component('font-awesome-icon', FontAwesomeIcon); 
 });

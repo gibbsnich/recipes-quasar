@@ -26,10 +26,10 @@
                         </accordion>
                         <ul class="list-group" id="action-group">
                             <li class="list-group-item">
-                                <button type="button" class="btn btn-primary" @click="addRecipe" >Rezept anlegen</button>
+                                <button type="button" class="btn btn-primary" @click="addRecipe" ><font-awesome-icon icon="file" />&nbsp;Rezept anlegen</button>
                             </li>
                             <li class="list-group-item">
-                                <button type="button" :class="['btn', 'btn-primary', {active: showImporter}]" @click="importRecipe" >Rezept importieren</button>
+                                <button type="button" :class="['btn', 'btn-primary', {active: showImporter}]" @click="importRecipe"><font-awesome-icon icon="file-import" />&nbsp;Rezept importieren</button>
                                 <div v-show="showImporter">
                                     <RecipeImporter @recipe-imported="recipeImported" />
                                 </div>
@@ -37,7 +37,7 @@
                         </ul>
                     </div>
                     <div class="col-sm-9">
-                        <RecipeDetails :recipeId=recipeId :recipeData=recipeData :clearRecipe=clearRecipe @save="recipeSaved" />
+                        <RecipeDetails :recipeId=recipeId :recipeData=recipeData :clearRecipe=clearRecipe @save="recipeSaved" @delete="recipeDeleted" />
                     </div>
                 </div>
             </div>
@@ -106,6 +106,9 @@ export default defineComponent({
           } else {
               this.$store.dispatch('storeRecipe', recipe);
           }
+      },
+      recipeDeleted(recipe) {
+          this.$store.dispatch('deleteRecipe', recipe);
       },
       finishedHandlingUnknownIngredients() {
           this.$store.dispatch('storeRecipe', this.savedRecipe);
