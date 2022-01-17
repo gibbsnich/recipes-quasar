@@ -55,11 +55,15 @@ export default defineComponent({
     },
     watch: {
         date(date) {
+            debugger;
             if (this.date) {
                 const ingredientsEvent = this.$store.getters.getIngredientEventByStart(date + "T14:00");
                 if (ingredientsEvent) {
                     this.existingEvent = true;
                     this.ingredients = JSON.parse(JSON.stringify(ingredientsEvent.extendedProps.ingredients));
+                } else {
+                    this.existingEvent = false;
+                    this.ingredients = [];
                 }
             }
         },
