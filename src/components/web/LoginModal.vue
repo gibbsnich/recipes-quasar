@@ -1,6 +1,6 @@
 <template>
     <div class="modal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog" ref="modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Anmeldung</h5>
@@ -109,6 +109,14 @@ export default defineComponent({
             registerError: '',
         }
     },
+    beforeMount() {
+        document.addEventListener('mouseup', this.checkCloseModal);
+        document.addEventListener('touchend', this.checkCloseModal);
+    },
+    beforeUnmount() {
+        document.removeEventListener('mouseup', this.checkCloseModal);
+        document.removeEventListener('touchend', this.checkCloseModal);
+    },
     methods: {
         activateTab(tabName) {
             this.activeTab = tabName;
@@ -170,6 +178,11 @@ export default defineComponent({
                 this.registerError = '';
                 this.$store.commit('authenticated', true);
                 this.$store.dispatch('loadInitialData');
+            }
+        },
+        checkCloseModal(event) {
+            if (!this.$refs.modal.contains(event.target)) {
+                this.close();
             }
         },
         close() {
