@@ -29,7 +29,7 @@
                 <input type="text" class="form-control" placeholder="Neue Kategorie" v-model.trim="newRecipeCategoryName">
             </div>
             <div class="col-sm-2">
-                <button type="button" id="save-recipe-category-button" :class="['btn', 'btn-primary', {disabled: newRecipeCategoryName.length === 0 || this.$store.getters.getRecipeCategoryByName(newRecipeCategoryName)}]" @click="saveNewRecipeCategory"><font-awesome-icon icon="save" />&nbsp;Speichern</button>
+                <button type="button" id="save-recipe-category-button" :class="['btn', 'btn-outline-primary', {disabled: newRecipeCategoryName.length === 0 || this.$store.getters.getRecipeCategoryByName(newRecipeCategoryName)}]" @click="saveNewRecipeCategory"><font-awesome-icon icon="save" />&nbsp;Speichern</button>
             </div>
         </div>
     </div>
@@ -43,10 +43,10 @@
     </div>
     <div class="row mb-3">
         <div class="col-xs-6">
-            <button id="save-button" type="button" class="btn btn-primary" :disabled="currentRecipe.name === ''" @click="saveRecipe" ><font-awesome-icon icon="save" />&nbsp;Rezept speichern</button>
+            <button id="save-button" type="button" class="btn btn-outline-primary" :disabled="currentRecipe.name === ''" @click="saveRecipe" ><font-awesome-icon icon="save" />&nbsp;Rezept speichern</button>
         </div>
         <div class="col-xs-6">
-            <button id="save-button" type="button" class="btn btn-danger" :disabled="!currentRecipe.id" @click="deleteRecipe" ><font-awesome-icon icon="trash" />&nbsp;Rezept löschen</button>
+            <button id="save-button" type="button" class="btn btn-outline-danger" :disabled="!currentRecipe.id" @click="deleteRecipe" ><font-awesome-icon icon="trash" />&nbsp;Rezept löschen</button>
         </div>
     </div>
 </template>

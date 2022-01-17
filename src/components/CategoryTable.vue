@@ -4,6 +4,7 @@
             <tr>
                 <th scope="col">{{ this.name }}</th>
                 <th scope="col">&nbsp;</th>
+                <th v-if="allowDelete" scope="col">&nbsp;</th>
             </tr>
         </thead>
         <tbody>
@@ -16,6 +17,11 @@
                         <font-awesome-icon icon="save" />
                     </button>
                 </td>
+                <td v-if="allowDelete">
+                    <button type="button" class="btn btn-danger btn-sm" aria-label="Delete" @click="deleteAt(index)">
+                        <font-awesome-icon icon="trash" />
+                    </button>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -26,11 +32,15 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'CategoryTable',
-  emits: ['save'],
+  emits: ['save', 'delete'],
   props: {
         name: String,
         categoryItemsGetter: Function,
         refresh: Boolean,
+        allowDelete: {
+            type: Boolean,
+            default: false,
+        },
   },
   watch: {
       refresh(val) {
@@ -59,6 +69,12 @@ export default defineComponent({
     },
     save(index) {
         this.$emit('save', {id: this.categories[index].id, name: this.categories[index].name});
+        this.originalCategories = JSON.parse(JSON.stringify(this.categoryItemsGetter()));
+        this.updateDirty(index);
+    },
+    deleteAt(index) {
+        this.$emit('delete', this.categories[index].id);
+        this.categories = JSON.parse(JSON.stringify(this.categoryItemsGetter()));
         this.originalCategories = JSON.parse(JSON.stringify(this.categoryItemsGetter()));
         this.updateDirty(index);
     },
