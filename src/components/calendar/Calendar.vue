@@ -184,11 +184,6 @@ export default defineComponent({
                 clearTimeout(this.clickTimeout);
                 this.clickTimeout = null;
             }
-            
-            const len = this.selectedCells.length;
-            if (len > 0) {
-                this.fireSelection(this.day(this.selectedCells[0]), this.day(this.selectedCells[len - 1]));
-            }
         },
         touchmove(event) {
             const element = document.elementFromPoint(event.touches[0].pageX, event.touches[0].pageY);
@@ -236,9 +231,6 @@ export default defineComponent({
         },
         isSelected(dayVal) {
             return this.selectedCells.indexOf(dayVal) !== -1;
-        },
-        fireSelection(start, end) {
-            //console.log(`selected: ${start} - ${end}`);
         },
         clickedMidday(event) {
             this.showSelectRecipeModalFromEvent(event);

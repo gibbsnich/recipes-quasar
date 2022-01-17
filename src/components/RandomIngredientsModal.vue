@@ -1,6 +1,6 @@
 <template>
     <div class="modal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog" ref="modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Zutatenauswahl</h5>
@@ -67,9 +67,22 @@ export default defineComponent({
             }
         },
     },
+    beforeMount() {
+        document.addEventListener('mouseup', this.checkCloseModal);
+        document.addEventListener('touchend', this.checkCloseModal);
+    },
+    beforeUnmount() {
+        document.removeEventListener('mouseup', this.checkCloseModal);
+        document.removeEventListener('touchend', this.checkCloseModal);
+    },
     methods: {
         getIngredients(ingredientCategoryId) {
             return this.$store.getters.getSortedIngredientsByCategory(ingredientCategoryId);
+        },
+        checkCloseModal(event) {
+            if (!this.$refs.modal.contains(event.target)) {
+                this.closeNoSave();
+            }
         },
         close() {
             const nonEmptyIngredients = this.ingredients.filter((i) => i.amount !== '' || i.ingredient !== '');
