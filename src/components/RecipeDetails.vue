@@ -46,7 +46,7 @@
             <button id="save-button" type="button" class="btn btn-outline-primary" :disabled="currentRecipe.name === ''" @click="saveRecipe" ><font-awesome-icon icon="save" />&nbsp;Rezept speichern</button>
         </div>
         <div class="col-xs-6">
-            <button id="save-button" type="button" class="btn btn-outline-danger" :disabled="!currentRecipe.id" @click="deleteRecipe" ><font-awesome-icon icon="trash" />&nbsp;Rezept löschen</button>
+            <button id="delete-button" type="button" class="btn btn-outline-danger" :disabled="!currentRecipe.id" @click="deleteRecipe" ><font-awesome-icon icon="trash" />&nbsp;Rezept löschen</button>
         </div>
     </div>
 </template>
@@ -129,7 +129,7 @@ export default defineComponent({
     button.recipe-category-button {
         margin-right: .5rem;
     }
-    #save-button { 
+    #save-button, #delete-button { 
         margin-left: 2rem; margin-bottom: 1rem;
     }
     #save-recipe-category-button {
