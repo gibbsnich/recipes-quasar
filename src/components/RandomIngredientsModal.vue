@@ -67,14 +67,14 @@ export default defineComponent({
             }
         },
     },
-    beforeMount() {
-        document.addEventListener('mouseup', this.checkCloseModal);
-        document.addEventListener('touchend', this.checkCloseModal);
-    },
-    beforeUnmount() {
-        document.removeEventListener('mouseup', this.checkCloseModal);
-        document.removeEventListener('touchend', this.checkCloseModal);
-    },
+    // beforeMount() {
+    //     document.addEventListener('mouseup', this.checkCloseModal);
+    //     document.addEventListener('touchend', this.checkCloseModal);
+    // },
+    // beforeUnmount() {
+    //     document.removeEventListener('mouseup', this.checkCloseModal);
+    //     document.removeEventListener('touchend', this.checkCloseModal);
+    // },
     methods: {
         getIngredients(ingredientCategoryId) {
             return this.$store.getters.getSortedIngredientsByCategory(ingredientCategoryId);
@@ -89,7 +89,7 @@ export default defineComponent({
             if (nonEmptyIngredients.length > 0 || this.existingEvent) {
                 this.$emit('close', {
                     title: 'Zutaten',
-                    color: 'black',
+                    // color: 'black',
                     start: `${this.date}T14:00`,
                     end: `${this.date}T15:00`,
                     extendedProps: {extra: true, ingredients: nonEmptyIngredients},

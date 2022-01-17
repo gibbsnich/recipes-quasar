@@ -109,14 +109,14 @@ export default defineComponent({
             registerError: '',
         }
     },
-    beforeMount() {
-        document.addEventListener('mouseup', this.checkCloseModal);
-        document.addEventListener('touchend', this.checkCloseModal);
-    },
-    beforeUnmount() {
-        document.removeEventListener('mouseup', this.checkCloseModal);
-        document.removeEventListener('touchend', this.checkCloseModal);
-    },
+    // beforeMount() {
+    //     document.addEventListener('mouseup', this.checkCloseModal);
+    //     document.addEventListener('touchend', this.checkCloseModal);
+    // },
+    // beforeUnmount() {
+    //     document.removeEventListener('mouseup', this.checkCloseModal);
+    //     document.removeEventListener('touchend', this.checkCloseModal);
+    // },
     methods: {
         activateTab(tabName) {
             this.activeTab = tabName;
