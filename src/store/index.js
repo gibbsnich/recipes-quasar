@@ -263,6 +263,9 @@ export default store(function (/* { ssrContext } */) {
       toggleShoppingListItem(state, { listId, storeIndex, itemIndex, checked }) {
           state.shoppingLists.find(l => l.id === listId).stores[storeIndex].list[itemIndex].bought = checked;
       },
+      saveShoppingListName(state, { listId, name }) {
+          state.shoppingLists.find(l => l.id = listId).title = name;
+      },
       authenticated(state, isAuth) {
           state.isAuthenticated = isAuth;
       },
@@ -392,6 +395,10 @@ export default store(function (/* { ssrContext } */) {
       },
       async toggleShoppingListItem({ commit, state }, { listId, storeIndex, itemIndex, checked }) {
           commit('toggleShoppingListItem', { listId, storeIndex, itemIndex, checked });
+          saveAndCheckNetwork(['shopping_lists'], commit, state);
+      },
+      async saveShoppingListName({ commit, state }, { listId, name }) {
+          commit('saveShoppingListName', { listId, name });
           saveAndCheckNetwork(['shopping_lists'], commit, state);
       },
     },

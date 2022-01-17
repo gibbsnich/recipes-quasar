@@ -2,8 +2,18 @@
     <login-modal v-if="!$q.platform.is.electron && !$q.platform.is.capacitor" v-show="!this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth" />
     <div :class="{blur_bg: !this.$store.state.isAuthenticated && this.$store.state.isOnline && !this.$store.state.forceNoAuth}">
         <site-menu>
-            <h4>Einkaufsliste</h4>
             <div v-if="this.shoppingList">
+                <div class="row" style="width:90%; margin-bottom: .5rem;">
+                    <div class="col-xs-10">
+                        <input style="margin-left: 2rem;" type="text" class="form-control" v-model.trim="shoppingListName" />
+                    </div>
+                    <div class="col-xs-2">
+                        <button style="margin-left: 2rem;margin-top: .2rem" type="button" class="btn btn-success btn-sm" aria-label="Save Title"
+                            :disabled="(!this.shoppingList.title && shoppingListName === 'Einkaufsliste') || shoppingListName === this.shoppingList.title" @click="saveShoppingListName">
+                            <font-awesome-icon icon="save" />
+                        </button>
+                    </div>
+                </div>
                 <h6>{{ this.shoppingList.start }} &ndash; {{ this.shoppingList.end }}</h6>
                 <div v-for="(store, storeIndex) in this.shoppingList.stores" :key="store">
                     <div class="card">
@@ -24,6 +34,9 @@
                     <font-awesome-icon icon="trash" />&nbsp;Einkaufsliste löschen
                 </button>
             </div>
+            <div v-else>
+                <h4>Keine Einkaufsliste gefunden..</h4>
+            </div>
         </site-menu>
     </div>
 </template>
@@ -42,6 +55,23 @@ export default defineComponent({
     props: {
         shoppingListId: String,
     },
+    data() {
+        return {
+            shoppingListName: 'Einkaufsliste',
+        }
+    },
+    watch: {
+        shoppingList(list) {
+            if (list && list.title) {
+                this.shoppingListName = list.title;
+            }
+        },
+    },
+    created() {
+        if (this.shoppingList && this.shoppingList.title) {
+            this.shoppingListName = this.shoppingList.title;
+        }
+    },
     computed: {
         shoppingList: {
             get() {                              
@@ -56,6 +86,9 @@ export default defineComponent({
         deleteList() {
             this.$store.dispatch('deleteShoppingList', this.shoppingList.id);
             this.$router.push('/shoppinglists');
+        },
+        saveShoppingListName() {
+            this.$store.dispatch('saveShoppingListName', { listId: this.shoppingList.id, name: this.shoppingListName });
         },
     },
 });

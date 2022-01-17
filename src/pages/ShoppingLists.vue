@@ -14,11 +14,13 @@
                     <tbody>
                         <tr v-for="shoppingList in this.$store.getters.getShoppingLists" v-bind:key="shoppingList.id">
                             <td>
-                                <router-link :to="{ name: 'shopping-list', params: { shoppingListId: shoppingList.id }}">{{ shoppingList.start }} &ndash; {{ shoppingList.end }}</router-link>
+                                <router-link :to="{ name: 'shopping-list', params: { shoppingListId: shoppingList.id }}">
+                                    <span v-if="shoppingList.title">{{ shoppingList.title }}&nbsp;(</span>{{ shoppingList.start }} &ndash; {{ shoppingList.end }}<span v-if="shoppingList.title">)</span>
+                                </router-link>
                             </td>
                             <td>
                                 <button type="button" class="btn btn-danger btn-sm" aria-label="Save" @click="deleteList(shoppingList.id)">
-                                    <font-awesome-icon icon="minus-square" />
+                                    <font-awesome-icon icon="trash" />
                                 </button>
                             </td>
                         </tr>
