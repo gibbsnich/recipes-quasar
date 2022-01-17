@@ -146,25 +146,28 @@ export default defineComponent({
             return nums;
         },
         mousedown(dayVal) {
-            this.selectedCells = [];
-            this.isMouseDown = true;
-            this.lastSelectedCell = null;
-            this.clickTimeout = setTimeout(() => {
-                if (this.isMouseDown) {
-                    //debugger;
-                    if (this.lastSelectedCell) {
-                        if (this.selectedCells.indexOf(dayVal) === -1 || this.selectedCells.indexOf(this.lastSelectedCell) === -1) {
-                            if (this.day(dayVal) < this.day(this.lastSelectedCell)) {
-                                this.selectedCells = [dayVal, this.lastSelectedCell];
-                            } else {
-                                this.selectedCells = [this.lastSelectedCell, dayVal];
+            if (this.selectedCells.indexOf(dayVal) === -1) {
+                this.selectedCells = [];
+                this.isMouseDown = true;
+                this.lastSelectedCell = null;
+                this.clickTimeout = setTimeout(() => {
+                    if (this.isMouseDown) {
+                        if (this.lastSelectedCell) {
+                            if (this.selectedCells.indexOf(dayVal) === -1 || this.selectedCells.indexOf(this.lastSelectedCell) === -1) {
+                                if (this.day(dayVal) < this.day(this.lastSelectedCell)) {
+                                    this.selectedCells = [dayVal, this.lastSelectedCell];
+                                } else {
+                                    this.selectedCells = [this.lastSelectedCell, dayVal];
+                                }
                             }
+                        } else {
+                            this.selectedCells = [dayVal];
                         }
-                    } else {
-                        this.selectedCells = [dayVal];
                     }
-                }
-            }, 250);
+                }, 250);
+            } else {
+                this.isMouseDown = true;
+            }
         },
         mouseup(dayVal) {
             this.isMouseDown = false;
