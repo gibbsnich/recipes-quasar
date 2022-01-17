@@ -41,23 +41,7 @@ export default store(function (/* { ssrContext } */) {
   const Store = createStore({
     state () {
       return {
-          events: [{
-              title: 'Abendessen',
-              color: 'green',
-              extendedProps: {
-                  recur: true,
-              },
-              allDay: true,
-              startRecur: '1970-01-01'
-          }, {
-              title: 'Mittagessen',
-              color: 'blue',
-              extendedProps: {
-                  recur: true,
-              },
-              allDay: true,
-              startRecur: '1970-01-01'
-          }],
+          events: [],
           recipes: [],
           recipeCategories: [],
           ingredientCategories: [],
@@ -69,9 +53,13 @@ export default store(function (/* { ssrContext } */) {
           isOnline: true,
           dirtyValues: [],
           forceNoAuth: false,
+          lastSelectedCalendarDate: null,
       }
   },
   getters: {
+      getLastSelectedCalendarDate (state) {
+          return state.lastSelectedCalendarDate;
+      },
       isAuthenticated (state) {
           return state.isAuthenticated;
       },
@@ -132,19 +120,20 @@ export default store(function (/* { ssrContext } */) {
       },
       getShoppingList: (state) => (shoppingListId) => {
           return state.shoppingLists.find(shoppingList => shoppingList.id === shoppingListId);
-      }
+      },
   },
   mutations: {
       initStore(state, data) {
           state.recipes = data.recipes || [];
           state.recipeCategories = data.recipeCategories || [];
-          if (data.events && data.events.length > 0) {
-              state.events = data.events;
-          }
+          state.events = data.events || [];
           state.ingredients = data.ingredients || [];
           state.ingredientCategories = data.ingredientCategories || [];
           state.ingredientStores = data.ingredientStores || [];
           state.shoppingLists = data.shoppingLists || [];
+      },
+      updateLastSelectedCalendarDate(state, date) {
+          state.lastSelectedCalendarDate = date;
       },
       storeRecipe(state, recipe) {
           if (!recipe.id) {

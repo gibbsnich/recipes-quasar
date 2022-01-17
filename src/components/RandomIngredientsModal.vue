@@ -55,7 +55,6 @@ export default defineComponent({
     },
     watch: {
         date(date) {
-            debugger;
             if (this.date) {
                 const ingredientsEvent = this.$store.getters.getIngredientEventByStart(date + "T14:00");
                 if (ingredientsEvent) {

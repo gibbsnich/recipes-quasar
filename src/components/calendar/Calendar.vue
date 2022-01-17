@@ -90,12 +90,14 @@ export default defineComponent({
         }
     },
     beforeMount() {
-        this.baseDate = new Date();
+        const lastDate = this.$store.getters.getLastSelectedCalendarDate;
+        this.baseDate = lastDate ? lastDate : new Date();
         this.firstDay = this.computeFirstDay(this.baseDate, true);
         document.addEventListener('mousedown', this.checkToggleDropDown);
         document.addEventListener('touchstart', this.checkToggleDropDown);
     },
     beforeUnmount() {
+        this.$store.commit('updateLastSelectedCalendarDate', this.baseDate);
         document.removeEventListener('mousedown', this.checkToggleDropDown);
         document.removeEventListener('touchstart', this.checkToggleDropDown);
     },
@@ -155,9 +157,15 @@ export default defineComponent({
                         if (this.lastSelectedCell) {
                             if (this.selectedCells.indexOf(dayVal) === -1 || this.selectedCells.indexOf(this.lastSelectedCell) === -1) {
                                 if (this.day(dayVal) < this.day(this.lastSelectedCell)) {
-                                    this.selectedCells = [dayVal, this.lastSelectedCell];
+                                    this.selectedCells = [];
+                                    for (let n = dayVal; n <= this.lastSelectedCell; n++) {
+                                        this.selectedCells.push(n);
+                                    }
                                 } else {
-                                    this.selectedCells = [this.lastSelectedCell, dayVal];
+                                    this.selectedCells = [];
+                                    for (let n = this.lastSelectedCell; n <= dayVal; n++) {
+                                        this.selectedCells.push(n);
+                                    }
                                 }
                             }
                         } else {
@@ -167,6 +175,7 @@ export default defineComponent({
                 }, 250);
             } else {
                 this.isMouseDown = true;
+                this.lastSelectedCell = null;
             }
         },
         mouseup(dayVal) {
@@ -208,14 +217,16 @@ export default defineComponent({
                             }
                         }
                     } else { //remove cell
-                        if (dayVal < this.lastSelectedCell) {
-                            for (let n = this.selectedCells.length - 1; n > this.selectedCells.indexOf(dayVal); n--) {
-                                this.selectedCells.splice(n);
-                            }
-                        } else {
-                            const count = this.selectedCells.indexOf(dayVal);
-                            for (let n = 0; n < count; n++) {
-                                this.selectedCells = this.selectedCells.splice(1);
+                        if (this.lastSelectedCell) {
+                            if (dayVal < this.lastSelectedCell) {
+                                for (let n = this.selectedCells.length - 1; n > this.selectedCells.indexOf(dayVal); n--) {
+                                    this.selectedCells.splice(n);
+                                }
+                            } else {
+                                const count = this.selectedCells.indexOf(dayVal);
+                                for (let n = 0; n < count; n++) {
+                                    this.selectedCells = this.selectedCells.splice(1);
+                                }
                             }
                         }
                     }
