@@ -26,10 +26,14 @@
                         </accordion>
                         <ul class="list-group" id="action-group">
                             <li class="list-group-item">
-                                <button type="button" class="btn btn-primary" @click="addRecipe" ><font-awesome-icon icon="file" />&nbsp;Rezept anlegen</button>
+                                <button type="button" class="btn btn-outline-primary" @click="addRecipe" >
+                                    <font-awesome-icon icon="file" />&nbsp;Rezept anlegen
+                                </button>
                             </li>
                             <li class="list-group-item">
-                                <button type="button" :class="['btn', 'btn-primary', {active: showImporter}]" @click="importRecipe"><font-awesome-icon icon="file-import" />&nbsp;Rezept importieren</button>
+                                <button type="button" :class="['btn', 'btn-outline-primary', {active: showImporter}]" @click="importRecipe">
+                                    <font-awesome-icon icon="file-import" />&nbsp;Rezept importieren
+                                </button>
                                 <div v-show="showImporter">
                                     <RecipeImporter @recipe-imported="recipeImported" />
                                 </div>
