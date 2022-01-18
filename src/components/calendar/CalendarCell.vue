@@ -139,6 +139,12 @@ export default defineComponent({
         font-size: .8rem;
         padding-left: .5rem;
     }
+    @media(max-width: 575px) {
+        h6.col-title {
+            font-size: .6rem;
+            padding-left: 0;
+        }   
+    }
     h6.is-in-past {
         color: #999;
     }

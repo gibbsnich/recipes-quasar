@@ -61,13 +61,13 @@ export default defineComponent({
         }
     },
     watch: {
-        shoppingList(list) {
+        shoppingList(list) { //this will properly set name after url navigation o.O
             if (list && list.title) {
                 this.shoppingListName = list.title;
             }
         },
     },
-    created() {
+    created() { //this will properly set name after router-link
         if (this.shoppingList && this.shoppingList.title) {
             this.shoppingListName = this.shoppingList.title;
         }
