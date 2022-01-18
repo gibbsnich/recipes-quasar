@@ -70,22 +70,22 @@ export default store(function (/* { ssrContext } */) {
           return state.ingredients.find(i => i.ingredient === ingredientValue);
       },
       getSortedIngredients (state) {
-          return state.ingredients.sort((a, b) => a.ingredient < b.ingredient ? -1 : (b.ingredient < a.ingredient ? 1 : 0));
+          return state.ingredients.sort((a, b) => a.ingredient.toLowerCase() < b.ingredient.toLowerCase() ? -1 : (b.ingredient.toLowerCase() < a.ingredient.toLowerCase() ? 1 : 0));
       },
       getSortedIngredientsByCategory: (state) => (categoryId) => {
-          return state.ingredients.filter(i => i.categoryId === categoryId).sort((a, b) => a.ingredient < b.ingredient ? -1 : (b.ingredient < a.ingredient ? 1 : 0));
+          return state.ingredients.filter(i => i.categoryId === categoryId).sort((a, b) => a.ingredient.toLowerCase() < b.ingredient.toLowerCase() ? -1 : (b.ingredient.toLowerCase() < a.ingredient.toLowerCase() ? 1 : 0));
       },
       getIngredientCategoriesByName: (state) => (categoryName) => {
           return state.ingredientCategories.filter(ic => ic.name === categoryName);
       },
       getSortedIngredientCategories (state) {
-          return state.ingredientCategories.sort((a, b) => a.name < b.name ? -1 : (b.name < a.name ? 1 : 0));
+          return state.ingredientCategories.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : (b.name.toLowerCase() < a.name.toLowerCase() ? 1 : 0));
       },
       getIngredientStoresByName: (state) => (storeName) => {
           return state.ingredientStores.filter(is => is.name === storeName);
       },
       getSortedIngredientStores (state) {
-          return state.ingredientStores.sort((a, b) => a.name < b.name ? -1 : (b.name < a.name ? 1 : 0));
+          return state.ingredientStores.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : (b.name.toLowerCase() < a.name.toLowerCase() ? 1 : 0));
       },
       getEventByStart: (state) => (eventStart) => {
           return state.events.find(event => event.start === eventStart);
@@ -104,13 +104,13 @@ export default store(function (/* { ssrContext } */) {
           return state.recipes.find(recipe => recipe.url === recipeUrl);
       },
       getSortedRecipes: (state) => (recipeCategoryId) => {
-          return state.recipes.filter(r => r.recipeCategories.includes(recipeCategoryId)).sort((a, b) => a.ingredient < b.ingredient ? -1 : (b.ingredient < a.ingredient ? 1 : 0));
+          return state.recipes.filter(r => r.recipeCategories.includes(recipeCategoryId)).sort((a, b) => a.ingredient.toLowerCase() < b.ingredient.toLowerCase() ? -1 : (b.ingredient.toLowerCase() < a.ingredient.toLowerCase() ? 1 : 0));
       },
       getSortedRecipesWithoutCategory (state) {
-          return state.recipes.filter(r => r.recipeCategories.length === 0).sort((a, b) => a.name < b.name ? -1 : (b.name < a.name ? 1 : 0));
+          return state.recipes.filter(r => r.recipeCategories.length === 0).sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : (b.name.toLowerCase() < a.name.toLowerCase() ? 1 : 0));
       },
       getSortedRecipeCategories (state) {
-          return state.recipeCategories.sort((a, b) => a.name < b.name ? -1 : (b.name < a.name ? 1 : 0));
+          return state.recipeCategories.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : (b.name.toLowerCase() < a.name.toLowerCase() ? 1 : 0));
       },
       getRecipeCategoryByName: (state) => (recipeCategoryName) => {
           return state.recipeCategories.find(recipeCategory => recipeCategory.name === recipeCategoryName);
@@ -127,6 +127,59 @@ export default store(function (/* { ssrContext } */) {
           state.recipes = data.recipes || [];
           state.recipeCategories = data.recipeCategories || [];
           state.events = data.events || [];
+          
+          // cleanup data generated with older versions..
+          if (data.ingredients) {
+              data.ingredients.forEach(i => delete i.amount);
+
+              const vals = data.ingredients.reduce((s, i, idx) => {
+                  const variant = i.ingredient.trim();
+                  if (s[i.ingredient]) { 
+                      s[i.ingredient].indices.push(idx);
+                  } else if (s[variant]) {
+                      if (s[variant].variants.indexOf(i.ingredient) === -1) {
+                          s[variant].variants.push(i.ingredient);
+                      } 
+                      s[variant].indices.push(idx);
+                  } else { 
+                      s[i.ingredient] = {
+                          indices: [idx],
+                          variants: [i.ingredient],
+                          bestVariant: {
+                              name: variant,
+                              index: idx,
+                          },
+                      };
+                      i.ingredient = variant;
+                  }
+                  return s;
+              }, {});
+              const dupKeys = Object.keys(vals).filter(k => vals[k].indices.length > 1);
+
+              dupKeys.forEach(dk => {
+                  const dv = vals[dk];
+                  data.recipes.forEach(r => {
+                      r.ingredients.forEach(ri => {
+                          if (dv.variants.indexOf(ri.ingredient) !== -1) {
+                              const replaceBy = data.ingredients[dv.bestVariant.index];
+                              ri.ingredient = replaceBy.ingredient;
+                              ri.id = replaceBy.id;
+                              ri.categoryId = replaceBy.categoryId;
+                              ri.storeId = replaceBy.storeId;
+                          }
+                      });
+                  });
+              });
+              const delIndices = dupKeys.map(dk => { 
+                  vals[dk].indices.splice(0,1); 
+                  return vals[dk].indices; 
+              }).flat().sort((a, b) => a < b ? -1 : (b < a ? 1 : 0));
+              for (let n = delIndices.length - 1; n >= 0; n--) {
+                  const a = data.ingredients.splice(delIndices[n], 1);
+                //   console.log(`deleted: ${a[0].ingredient}`);
+              }
+          }
+          
           state.ingredients = data.ingredients || [];
           state.ingredientCategories = data.ingredientCategories || [];
           state.ingredientStores = data.ingredientStores || [];
