@@ -226,7 +226,6 @@ export default store(function (/* { ssrContext } */) {
           state.recipeCategories.find(rc => rc.id === id).name = name;
       },
       deleteRecipeCategory(state, recipeCategoryId) {
-          debugger;
           const recipeCategoryIndex = state.recipeCategories.findIndex(rc => rc.id === recipeCategoryId);
           state.recipeCategories.splice(recipeCategoryIndex, 1);
           state.recipes.forEach(r => {

@@ -7,7 +7,7 @@
                 <div class="row">
                     <div class="col-sm-3">
                         <h6>Vorhandene Rezepte:</h6>
-                        <accordion v-bind:categories="this.$store.getters.getSortedRecipeCategories" v-bind:categoryItemsGetter="this.getRecipes"
+                        <accordion style="margin-bottom: .5rem" v-bind:categories="this.$store.getters.getSortedRecipeCategories" v-bind:categoryItemsGetter="this.getRecipes"
                             restCategoryName="Ohne Kategorie" v-bind:restCategoryItems="this.$store.getters.getSortedRecipesWithoutCategory" @itemSelected="selectRecipe">
                             <template v-slot:default="slotProps">
                                 <div class="list-group">
