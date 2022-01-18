@@ -305,7 +305,7 @@ export default defineComponent({
     .calendar-container {
         margin-left: auto;
         margin-right: auto;
-        max-width: 1240px;
+        max-width: 1440px;
     }
     .calendar-controls {
         text-align: center;

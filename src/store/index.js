@@ -97,6 +97,9 @@ export default store(function (/* { ssrContext } */) {
           const subStringLower = subString.toLowerCase();
           return state.ingredients.filter(i => i.ingredient.toLowerCase().indexOf(subStringLower) > -1);
       },
+      getRecipesExist (state) {
+          return state.recipes.length > 0;
+      },
       getRecipeById: (state) => (recipeId) => {
           return state.recipes.find(recipe => recipe.id === recipeId);
       },
