@@ -26,7 +26,7 @@
                         v-model.trim="newIngredient.ingredient" v-on:keyup="maybeShowIngredients(-1, $event)" rows="1" />
                     <ul class="dropdown-menu" v-show="newIngredientDropDownIngredients.length > 0">
                         <li v-for="ddingredient in newIngredientDropDownIngredients" v-bind:key="ddingredient.id" aria-labelledby="dd_new">
-                            <a class="dropdown-item" href="javascript:void(0)" v-on:click="newIngredient.ingredient = ddingredient.ingredient"><span v-html="ddingredient.highlight"></span></a>
+                            <a class="dropdown-item" href="javascript:void(0)" v-on:click="addIngredientFromDropDown(ddingredient.ingredient)"><span v-html="ddingredient.highlight"></span></a>
                         </li>
                     </ul>
                 </div>
@@ -97,6 +97,10 @@ export default defineComponent({
             this.checkExistingIngredient(ingredientIndex);
             this.dropDownIngredients = [];
             this.newIngredientDropDownIngredients = [];
+        },
+        addIngredientFromDropDown(ddIngredient) {
+            this.newIngredient.ingredient = ddIngredient;
+            this.addIngredient();
         },
         addIngredient() {
             this.newIngredient.ingredient = this.newIngredient.ingredient.trim();

@@ -104,7 +104,7 @@ export default store(function (/* { ssrContext } */) {
           return state.recipes.find(recipe => recipe.url === recipeUrl);
       },
       getSortedRecipes: (state) => (recipeCategoryId) => {
-          return state.recipes.filter(r => r.recipeCategories.includes(recipeCategoryId)).sort((a, b) => a.ingredient.toLowerCase() < b.ingredient.toLowerCase() ? -1 : (b.ingredient.toLowerCase() < a.ingredient.toLowerCase() ? 1 : 0));
+          return state.recipes.filter(r => r.recipeCategories.includes(recipeCategoryId)).sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : (b.name.toLowerCase() < a.name.toLowerCase() ? 1 : 0));
       },
       getSortedRecipesWithoutCategory (state) {
           return state.recipes.filter(r => r.recipeCategories.length === 0).sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : (b.name.toLowerCase() < a.name.toLowerCase() ? 1 : 0));
