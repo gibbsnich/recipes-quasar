@@ -1,5 +1,22 @@
 <template>
     <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Menge" aria-label="Menge" v-model.trim="newIngredient.amount">
+                <div class="dropdown">
+                    <textarea type="text" id="dd_new" :class="['form-control', 'dropdown-toggle', {unknown: !newIngredient.id}]" placeholder="Zutat" aria-label="Zutat" data-bs-toggle="dropdown" 
+                        v-model.trim="newIngredient.ingredient" v-on:keyup="maybeShowIngredients(-1, $event)" rows="1" />
+                    <ul class="dropdown-menu" v-show="newIngredientDropDownIngredients.length > 0">
+                        <li v-for="ddingredient in newIngredientDropDownIngredients" v-bind:key="ddingredient.id" aria-labelledby="dd_new">
+                            <a class="dropdown-item" href="javascript:void(0)" v-on:click="addIngredientFromDropDown(ddingredient.ingredient)"><span v-html="ddingredient.highlight"></span></a>
+                        </li>
+                    </ul>
+                </div>
+                <button type="button" class="btn btn-success btn-sm" aria-label="Add Ingredient" @click="addIngredient()">
+                    <font-awesome-icon icon="plus-square" />
+                </button>
+            </div>
+        </li>
         <li class="list-group-item" v-for="(ingredient, index) in ingredients" v-bind:key="index">
             <div class="input-group">
                 <input type="text"  class="form-control" placeholder="Menge" aria-label="Menge" v-model.trim="ingredient.amount">
@@ -15,23 +32,6 @@
                 </div>
                 <button type="button" class="btn btn-danger btn-sm" aria-label="Delete Ingredient" @click="deleteIngredient(index)">
                     <font-awesome-icon icon="minus-square" />
-                </button>
-            </div>
-        </li>
-        <li class="list-group-item">
-            <div class="input-group">
-                <input type="text" class="form-control" placeholder="Menge" aria-label="Menge" v-model.trim="newIngredient.amount">
-                <div class="dropdown">
-                    <textarea type="text" id="dd_new" :class="['form-control', 'dropdown-toggle', {unknown: !newIngredient.id}]" placeholder="Zutat" aria-label="Zutat" data-bs-toggle="dropdown" 
-                        v-model.trim="newIngredient.ingredient" v-on:keyup="maybeShowIngredients(-1, $event)" rows="1" />
-                    <ul class="dropdown-menu" v-show="newIngredientDropDownIngredients.length > 0">
-                        <li v-for="ddingredient in newIngredientDropDownIngredients" v-bind:key="ddingredient.id" aria-labelledby="dd_new">
-                            <a class="dropdown-item" href="javascript:void(0)" v-on:click="addIngredientFromDropDown(ddingredient.ingredient)"><span v-html="ddingredient.highlight"></span></a>
-                        </li>
-                    </ul>
-                </div>
-                <button type="button" class="btn btn-success btn-sm" aria-label="Add Ingredient" @click="addIngredient()">
-                    <font-awesome-icon icon="plus-square" />
                 </button>
             </div>
         </li>
