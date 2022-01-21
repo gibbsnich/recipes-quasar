@@ -198,12 +198,16 @@ export default store(function (/* { ssrContext } */) {
               state.recipes.push(recipe);
           } else {
               const recipeIndex = state.recipes.findIndex(r => r.id === recipe.id);
-              state.recipes[recipeIndex] = recipe;
+              if (recipeIndex !== -1) {
+                state.recipes[recipeIndex] = recipe;
+              }
           }
       },
       deleteRecipe(state, recipe) {
           const recipeIndex = state.recipes.findIndex(r => r.id === recipe.id);
-          state.recipes.splice(recipeIndex, 1);
+          if (recipeIndex !== -1) {
+            state.recipes.splice(recipeIndex, 1);
+          }
           let idx;
           do {
               idx = state.events.findIndex(e => e.extendedProps.recipeId === recipe.id);
@@ -230,7 +234,9 @@ export default store(function (/* { ssrContext } */) {
       },
       deleteRecipeCategory(state, recipeCategoryId) {
           const recipeCategoryIndex = state.recipeCategories.findIndex(rc => rc.id === recipeCategoryId);
-          state.recipeCategories.splice(recipeCategoryIndex, 1);
+          if (recipeCategoryIndex !== -1) {
+            state.recipeCategories.splice(recipeCategoryIndex, 1);
+          }
           state.recipes.forEach(r => {
               const rIndex = r.recipeCategories.findIndex(rc => rc === recipeCategoryId);
               if (rIndex !== -1) {
@@ -250,7 +256,9 @@ export default store(function (/* { ssrContext } */) {
       },
       updateIngredient(state, ingredient) {
           const ingredientIndex = state.ingredients.findIndex(i => i.id === ingredient.id);
-          state.ingredients[ingredientIndex] = ingredient;
+          if (ingredientIndex !== -1) {
+            state.ingredients[ingredientIndex] = ingredient;
+          }
       },
       storeIngredientCategory(state, ingredientCategoryName) {
           const newIngredientCategoryId = nextId(state.ingredientCategories);
@@ -312,8 +320,10 @@ export default store(function (/* { ssrContext } */) {
           state.shoppingLists.push(shoppingList);
       },
       deleteShoppingList(state, shoppingListId) {
-        const listIndex = state.shoppingLists.findIndex(l => l.id === shoppingListId.id);
-        state.shoppingLists.splice(listIndex, 1);
+        const listIndex = state.shoppingLists.findIndex(l => l.id === shoppingListId);
+        if (listIndex !== -1) {
+            state.shoppingLists.splice(listIndex, 1);
+        }
       },
       toggleShoppingListItem(state, { listId, storeIndex, itemIndex, checked }) {
           state.shoppingLists.find(l => l.id === listId).stores[storeIndex].list[itemIndex].bought = checked;
