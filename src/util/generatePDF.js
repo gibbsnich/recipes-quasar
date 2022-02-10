@@ -6,7 +6,7 @@ const MAX_PAGE_Y = 290;
 
 export const addToAutoShoppingList = (store, autoIngredientList, ingredient) => {
     const key = `${ingredient.ingredient}`;
-    const shoppingList = store.getters.getShoppingListData({ allIngredients: makeIngredientsMap([ingredient]), ingredientKeys: [ingredient.ingredient] }, /*store,*/ autoIngredientList);
+    const shoppingList = store.getters.getShoppingListData({ allIngredients: makeIngredientsMap([ingredient]), ingredientKeys: [ingredient.ingredient] }, autoIngredientList);
     shoppingList.id = 'auto';
     store.dispatch('storeShoppingList', shoppingList);
     return shoppingList;
@@ -22,7 +22,8 @@ export const generateShoppingList = ({start, end}, store) => {
 };
 
 export const generatePDF = ({start, end}, store) => {
-    const shoppingList = store.getters.getShoppingListData(store.getters.getIngredientData({start: dateToString(start), end: dateToString(end)}));
+    const { allIngredients, currentEvents, ingredientKeys } = store.getters.getIngredientData({start: dateToString(start), end: dateToString(end)});
+    const shoppingList = store.getters.getShoppingListData({ allIngredients, currentEvents, ingredientKeys });
     const doc = new jsPDF();
     doc.setFontSize('16');
     doc.text('Einkaufsliste', 60, 10);
