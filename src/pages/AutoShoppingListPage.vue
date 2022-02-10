@@ -168,6 +168,7 @@ export default defineComponent({
         finishedHandlingUnknownIngredients() {
             this.shoppingList = addToAutoShoppingList(this.$store, this.shoppingList, this.newIngredient);
             this.newIngredientsEvent = null;
+            this.newIngredient = this.makeEmptyIngredient();
         },
 
         makeEmptyIngredient() {

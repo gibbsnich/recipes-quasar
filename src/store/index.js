@@ -125,7 +125,7 @@ export default store(function (/* { ssrContext } */) {
           return state.recipeCategories.find(recipeCategory => recipeCategory.name === recipeCategoryName);
       },
       getShoppingLists (state) {
-          return state.shoppingLists.filter(sl => !sl.id === 'auto').sort((a, b) => a.id < b.id ? -1 : (b.id < a.id ? 1 : 0));
+          return state.shoppingLists.filter(sl => sl.id !== 'auto').sort((a, b) => a.id < b.id ? -1 : (b.id < a.id ? 1 : 0));
       },
       getShoppingList: (state) => (shoppingListId) => {
           return state.shoppingLists.find(shoppingList => shoppingList.id === shoppingListId);
@@ -179,7 +179,7 @@ export default store(function (/* { ssrContext } */) {
                     if (filteredKeys.length > 0) {
                         filteredKeys.sort((a, b) => a < b ? -1 : (b < a ? 1 : 0)).forEach((i, idx) => {
                             const text = allIngredients[i].amount && allIngredients[i].amount.length > 0 ? `${allIngredients[i].amount} ${i}` : i;
-                            if (storeShoppingList.filter((i) => i.label !== text).length === 0) {
+                            if (storeShoppingList.filter((i) => i.label === text).length === 0) {
                                 storeShoppingList.push({label: text, bought: false});
                             }
                         });
