@@ -4,6 +4,12 @@
         <site-menu activeTab="shoppinglists">
             <div class="container">
                 <h4>Einkaufslisten</h4>
+
+                <button type="button" class="btn btn-link" style="margin-bottom:1rem">
+                    <font-awesome-icon icon="meteor" />
+                    <router-link :to="{ name: 'auto-shopping-list' }">Auto-Einkaufsliste</router-link>
+                </button>
+
                 <table class="table" v-if="this.$store.getters.getShoppingLists.length > 0">
                     <thead>
                         <tr>
@@ -61,5 +67,9 @@ export default defineComponent({
   a {
       margin-left: 1rem;
       color: #0d6efd;
+      text-decoration: none;
+  }
+  .btn-link {
+      text-decoration: none;
   }
 </style>

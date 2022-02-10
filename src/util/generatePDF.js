@@ -1,77 +1,28 @@
 import { dateToString, dateStringToReadableString } from './date.js';
-import { toRaw } from 'vue';
+import { makeIngredientsMap } from './entity.js';
 import jsPDF, { AcroFormCheckBox } from 'jspdf';
 
 const MAX_PAGE_Y = 290;
 
-const generateIngredientData = ({start, end}, store) => {
-    const currentEvents = store.state.events.filter((e) => {
-        if (!e.start) {
-            return false;
-        }
-        const st = e.start.substring(0, e.start.length - 6);
-        return st >= start && st <= end;
-    }).map((e) => toRaw(e));
-    //can contain multiple instances of the same recipe!
-    const currentRecipes = currentEvents.filter((e) => !e.extendedProps.extra).map((e) => toRaw(store.state.recipes.filter((r) => r.id === e.extendedProps.recipeId)[0]));
-    const allIngredientsPerRecipe = currentRecipes.map((r) => r.ingredients).flat(2);
-    const extraEvents = currentEvents.filter((e) => e.extendedProps.extra).map((e) => e.extendedProps.ingredients);
-    extraEvents.forEach((i) => i.forEach((ii) => allIngredientsPerRecipe.push(ii)));
-    const allIngredients = allIngredientsPerRecipe.reduce((memo, i) => {
-        if (memo[i.ingredient]) {
-            if (i.amount && i.amount !== '') {
-                if (memo[i.ingredient].amount) {
-                    memo[i.ingredient].amount = `${memo[i.ingredient].amount} + ${i.amount}`;
-                } else {
-                    memo[i.ingredient].amount = `${i.amount}`;
-                }
-            }
-        } else {
-            memo[i.ingredient] = {store: i.storeId, category: i.categoryId};
-            if (i.amount) {
-                memo[i.ingredient].amount = i.amount;
-            }
-        }
-        return memo;
-    }, {});
-    return { allIngredients, currentEvents, ingredientKeys: Object.keys(allIngredients).sort((a, b) => a < b ? -1 : (b < a ? 1 : 0)) };
-};
-
-const generateShoppingListInternal = ({ allIngredients, currentEvents, ingredientKeys }, store) => {
-    const stores = store.getters.getSortedIngredientStores;
-    const categories = store.getters.getSortedIngredientCategories;
-    const shoppingList = {};
-    shoppingList.stores = [];
-    stores.forEach((store, idx) => {
-        if (ingredientKeys.filter(ik => allIngredients[ik].store === store.id).length > 0) {
-            const storeShoppingList = [];
-            categories.forEach((category, idx) => {
-                const filteredKeys = ingredientKeys.filter(ik => allIngredients[ik].store === store.id && allIngredients[ik].category === category.id);
-                if (filteredKeys.length > 0) {
-                    filteredKeys.sort((a, b) => a < b ? -1 : (b < a ? 1 : 0)).forEach((i, idx) => {
-                        const text = allIngredients[i].amount && allIngredients[i].amount.length > 0 ? `${allIngredients[i].amount} ${i}` : i;
-                        storeShoppingList.push({label: text, bought: false});
-                    });
-                }
-            });
-            shoppingList.stores.push({name: store.name, list: storeShoppingList});   
-        }
-    });
+export const addToAutoShoppingList = (store, autoIngredientList, ingredient) => {
+    const key = `${ingredient.ingredient}`;
+    const shoppingList = store.getters.getShoppingListData({ allIngredients: makeIngredientsMap([ingredient]), ingredientKeys: [ingredient.ingredient] }, /*store,*/ autoIngredientList);
+    shoppingList.id = 'auto';
+    store.dispatch('storeShoppingList', shoppingList);
     return shoppingList;
 };
 
 export const generateShoppingList = ({start, end}, store) => {
     const startString = dateToString(start);
     const endString = dateToString(end);
-    const shoppingList = generateShoppingListInternal(generateIngredientData({start: startString, end: endString}, store), store);
+    const shoppingList = store.getters.getShoppingListData(store.getters.getIngredientData({start: startString, end: endString}));
     shoppingList.start = dateStringToReadableString(startString);
     shoppingList.end = dateStringToReadableString(endString);
     return shoppingList;
 };
 
 export const generatePDF = ({start, end}, store) => {
-    const { allIngredients, currentEvents, ingredientKeys } = generateIngredientData({start: dateToString(start), end: dateToString(end)}, store);
-    const shoppingList = generateShoppingListInternal({ allIngredients, currentEvents, ingredientKeys }, store);
+    const shoppingList = store.getters.getShoppingListData(store.getters.getIngredientData({start: dateToString(start), end: dateToString(end)}));
     const doc = new jsPDF();
     doc.setFontSize('16');
     doc.text('Einkaufsliste', 60, 10);

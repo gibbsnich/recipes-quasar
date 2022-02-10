@@ -1,9 +1,12 @@
 import { store } from 'quasar/wrappers'
+import { toRaw } from 'vue'
 import { createStore } from 'vuex'
 
-import { dateToTimeString } from '../util/date.js'
+import { dateToString, dateToTimeString } from '../util/date.js'
 import { recurEventToEvent } from '../util/event.js'
-import { nextId } from '../util/entity.js'
+import { nextId, makeIngredientsMap } from '../util/entity.js'
+
+//import { generateIngredientData, generateShoppingListInternal } from '../util/generatePDF.js'
 
 // import example from './module-example'
 
@@ -63,6 +66,9 @@ export default store(function (/* { ssrContext } */) {
       isAuthenticated (state) {
           return state.isAuthenticated;
       },
+      isInitialized (state) {
+          return state.isInitialized;
+      },
       getIngredientById: (state) => (ingredientId) => {
           return state.ingredients.find(i => i.id === ingredientId);
       },
@@ -119,10 +125,82 @@ export default store(function (/* { ssrContext } */) {
           return state.recipeCategories.find(recipeCategory => recipeCategory.name === recipeCategoryName);
       },
       getShoppingLists (state) {
-          return state.shoppingLists.sort((a, b) => a.id < b.id ? -1 : (b.id < a.id ? 1 : 0));
+          return state.shoppingLists.filter(sl => !sl.id === 'auto').sort((a, b) => a.id < b.id ? -1 : (b.id < a.id ? 1 : 0));
       },
       getShoppingList: (state) => (shoppingListId) => {
           return state.shoppingLists.find(shoppingList => shoppingList.id === shoppingListId);
+      },
+
+      getIngredientData: (state) => ({ start, end }) => {
+        let currentEvents;
+        if (!start && !end) {
+            const startToday = dateToString(new Date());
+            currentEvents = state.events.filter((e) => {
+                if (!e.start) {
+                    return false;
+                }
+                const st = e.start.substring(0, e.start.length - 6);
+                return st >= startToday && !e.isInAutoList;
+            }).map((e) => toRaw(e));
+        } else {
+            currentEvents = state.events.filter((e) => {
+                if (!e.start) {
+                    return false;
+                }
+                const st = e.start.substring(0, e.start.length - 6);
+                return st >= start && st <= end;
+            }).map((e) => toRaw(e));
+        }
+        //can contain multiple instances of the same recipe!
+        const currentRecipes = currentEvents.filter((e) => !e.extendedProps.extra).map((e) => toRaw(state.recipes.filter((r) => r.id === e.extendedProps.recipeId)[0]));
+        const allIngredientsPerRecipe = currentRecipes.map((r) => r.ingredients).flat(2);
+        const extraEvents = currentEvents.filter((e) => e.extendedProps.extra).map((e) => e.extendedProps.ingredients);
+        extraEvents.forEach((i) => i.forEach((ii) => allIngredientsPerRecipe.push(ii)));
+        const allIngredients = makeIngredientsMap(allIngredientsPerRecipe);
+        return { allIngredients, currentEvents, ingredientKeys: Object.keys(allIngredients).sort((a, b) => a < b ? -1 : (b < a ? 1 : 0)) };
+      },
+
+      getShoppingListData: (state) => ({ allIngredients, currentEvents, ingredientKeys }, existingList = null) => {
+        const stores = state.ingredientStores.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : (b.name.toLowerCase() < a.name.toLowerCase() ? 1 : 0));// store.getters.getSortedIngredientStores;
+        const categories = state.ingredientCategories.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : (b.name.toLowerCase() < a.name.toLowerCase() ? 1 : 0)); //store.getters.getSortedIngredientCategories;
+        const shoppingList = {};
+        shoppingList.stores = [];
+        stores.forEach((store, idx) => {
+            if (ingredientKeys.filter(ik => allIngredients[ik].store === store.id).length > 0 || existingList) {
+                var storeShoppingList = []
+                if (existingList) {
+                    const idx = existingList.stores.findIndex((s) => s.name === store.name);
+                    if (idx !== -1) {
+                        storeShoppingList = existingList.stores[idx].list;
+                    }
+                }
+                categories.forEach((category, idx) => {
+                    const filteredKeys = ingredientKeys.filter(ik => allIngredients[ik].store === store.id && allIngredients[ik].category === category.id);
+                    if (filteredKeys.length > 0) {
+                        filteredKeys.sort((a, b) => a < b ? -1 : (b < a ? 1 : 0)).forEach((i, idx) => {
+                            const text = allIngredients[i].amount && allIngredients[i].amount.length > 0 ? `${allIngredients[i].amount} ${i}` : i;
+                            if (storeShoppingList.filter((i) => i.label !== text).length === 0) {
+                                storeShoppingList.push({label: text, bought: false});
+                            }
+                        });
+                    }
+                });
+                if (storeShoppingList.length > 0) {
+                    shoppingList.stores.push({name: store.name, list: storeShoppingList});   
+                }
+            }
+        });
+
+        return shoppingList;
+      },
+
+      getAutoShoppingList (state, getters) {
+        const existingShoppingList = getters.getShoppingList('auto');
+        const newData = getters.getIngredientData({start: null, end: null});
+        const shoppingList = getters.getShoppingListData(newData, existingShoppingList);
+        newData.currentEvents.forEach((e) => e.isInAutoList = true);
+        shoppingList.id = 'auto';
+        return shoppingList;
       },
   },
   mutations: {
@@ -315,8 +393,15 @@ export default store(function (/* { ssrContext } */) {
           });
       },
       storeShoppingList(state, shoppingList) {
-          const newShoppingListId = nextId(state.shoppingLists);
-          shoppingList.id = newShoppingListId;
+          if (!shoppingList.id) {
+            const newShoppingListId = nextId(state.shoppingLists);
+            shoppingList.id = newShoppingListId;
+          } else {
+              const idx = state.shoppingLists.findIndex((sl) => sl.id === shoppingList.id);
+              if (idx !== -1) {
+                state.shoppingLists.splice(idx, 1);
+              }
+          }
           state.shoppingLists.push(shoppingList);
       },
       deleteShoppingList(state, shoppingListId) {
@@ -452,7 +537,8 @@ export default store(function (/* { ssrContext } */) {
       },
       async storeShoppingList({ commit, state }, shoppingList) {
           commit('storeShoppingList', shoppingList);
-          saveAndCheckNetwork(['shopping_lists'], commit, state);
+          // 'events' because they were maybe marked as 'isInList'
+          saveAndCheckNetwork(['events', 'shopping_lists'], commit, state);
       },
       async deleteShoppingList({ commit, state }, shoppingListId) {
           commit('deleteShoppingList', shoppingListId);
@@ -466,6 +552,7 @@ export default store(function (/* { ssrContext } */) {
           commit('saveShoppingListName', { listId, name });
           saveAndCheckNetwork(['shopping_lists'], commit, state);
       },
+
     },
     /*
     modules: {

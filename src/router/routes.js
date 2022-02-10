@@ -5,6 +5,7 @@ const routes = [
   { path: '/categories', component: () => import('pages/Categories.vue') },
   { path: '/shoppinglists', component: () => import('pages/ShoppingLists.vue') },
   { path: '/shopping-list/:shoppingListId', component: () => import('pages/ShoppingListPage.vue'), props: true, name: 'shopping-list' },
+  { path: '/auto-shopping-list', component: () => import('pages/AutoShoppingListPage.vue'), name: 'auto-shopping-list' },
 ]
 
 export default routes
