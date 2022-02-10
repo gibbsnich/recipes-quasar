@@ -4,13 +4,13 @@
             {{ new Intl.DateTimeFormat('de-DE', {weekday: 'short', day: 'numeric', month: 'numeric'}).format(this.date) }}
         </h6>
         <span :class="['event-banner', 'mittag', {unknown: !this.middayEvent.extendedProps.recipeId}]" @click="this.middayClicked($event)">
-            &nbsp;{{ this.middayEvent.title }}
+            &nbsp;<span v-if="this.middayEvent.isInAutoList"><font-awesome-icon icon="check-square" />&nbsp;</span>&nbsp;{{ this.middayEvent.title }}
         </span>
         <span :class="['event-banner', 'abend', {unknown: !this.eveningEvent.extendedProps.recipeId}]" @click="this.eveningClicked($event)">
-            &nbsp;{{ this.eveningEvent.title }}
+            &nbsp;<span v-if="this.eveningEvent.isInAutoList"><font-awesome-icon icon="check-square" />&nbsp;</span>{{ this.eveningEvent.title }}
         </span>
         <span :class="['event-banner', 'zusatz', {unknown: this.additionalEvent.extendedProps.ingredients.length === 0}]" @click="this.additionalClicked($event)">
-            &nbsp;Zusatz
+            &nbsp;<span v-if="this.additionalEvent.isInAutoList"><font-awesome-icon icon="check-square" />&nbsp;</span>&nbsp;Zusatz
         </span>
     </div>
 </template>
