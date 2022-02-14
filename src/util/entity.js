@@ -22,3 +22,17 @@ export const makeIngredientsMap = (allIngredients) => {
         return memo;
     }, {});
 }
+
+export const splitIngredients = (ingredientText) => {
+    return ingredientText.split("\n").filter(l => l.length > 0).map(l => { 
+        const md = l.match(/^((([0-9]+)\s*)((g)|(ml)|(Bund)|(EL)|(Dose)|(Liter)|(St.ck)))/i);
+        if (!!md) {
+            return { amount: md[0], ingredient: l.substring(md[0].length, l.length).trim() };
+        }
+        const lineSplit = l.trim().split(/\s+/);
+        if (lineSplit.length > 1) {
+            return {amount: lineSplit[0], ingredient: lineSplit.splice(1, lineSplit.length-1).join(' ').trim()};
+        } 
+        return {amount: '', ingredient: l.trim()};  
+    });
+}

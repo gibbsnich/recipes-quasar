@@ -40,6 +40,7 @@
 
 <script>
 import { defineComponent } from 'vue';
+import { splitIngredients } from '../util/entity.js';
 
 export default defineComponent({
     name: 'IngredientsList',
@@ -111,13 +112,8 @@ export default defineComponent({
                     this.ingredients.push(this.newIngredient);
                     this.checkExistingIngredient(this.ingredients.length - 1);
                 } else {
-                    const newIngredients = this.newIngredient.ingredient.split("\n").filter(l => l.length > 0).map(l => { 
-                        const lineSplit = l.split(' ');
-                        if (lineSplit.length > 1) {
-                            return {amount: lineSplit[0], ingredient: lineSplit.splice(1, lineSplit.length-1).join(' ').trim()};
-                        }
-                        return {amount: '', ingredient: l.trim()};
-                    });
+                    debugger;
+                    const newIngredients =  splitIngredients(this.newIngredient.ingredient);
                     this.ingredients.push.apply(this.ingredients, newIngredients);
                     newIngredients.forEach((v, i) => this.checkExistingIngredient(this.ingredients.length - i - 1));
                 }
